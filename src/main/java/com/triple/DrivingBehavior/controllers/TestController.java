@@ -2,7 +2,10 @@ package com.triple.DrivingBehavior.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.triple.DrivingBehavior.domain.User;
 
 @Controller
 public class TestController
@@ -18,5 +21,14 @@ public class TestController
 		mv.addObject("name",name);
 		mv.setViewName("/demo/hello");
 		return mv;
+	}
+	@RequestMapping("value=/demo/addUser.json")
+	@ResponseBody
+	public User addUser()
+	{
+		User user=new User();
+		user.setUserName("a");
+		user.setCode("123");
+		return user;
 	}
 }
