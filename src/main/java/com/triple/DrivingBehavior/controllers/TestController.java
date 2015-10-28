@@ -11,18 +11,18 @@ import com.triple.DrivingBehavior.domain.User;
 public class TestController
 {
 	@RequestMapping(value="/demo/hello")
-	public ModelAndView hello(String name)
+	public ModelAndView hello(String username)
 	{
 		ModelAndView mv=new ModelAndView();
-		if(name==null||name.equals(""))
+		if(username==null||username.equals(""))
 		{
-			name="world";
+			username="world";
 		}
-		mv.addObject("name",name);
+		mv.addObject("username",username);
 		mv.setViewName("/demo/hello");
 		return mv;
 	}
-	@RequestMapping("value=/demo/addUser.json")
+	@RequestMapping(value="/demo/addUser.json")
 	@ResponseBody
 	public User addUser()
 	{
