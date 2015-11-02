@@ -79,9 +79,13 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
     <div id="main_panels">
         <div class="panels_slider" id="map1">
         </div>
-         
     </div>
-
+<div id="top_info">
+    
+    <input type="text" name="speed" value="0" style="width: 100%; height: 100%; font-size: 70px;"id="speed";>
+    <input type="text" name="direction" value="0" style="width: 100%; height: 100%; font-size: 70px;"id="direction";>
+    
+     </div>
     <div id="bottom_nav">
         <div class="icons_nav">
                 <div class="paginated"> <!--Remove this DIV if you want to remove the pagination-->
@@ -119,8 +123,18 @@ function theLocation(longitude,latitude)
 						var marker = new BMap.Marker(new_point);  // 创建标注
 						map.addOverlay(marker);              // 将标注添加到地图中
 						map.panTo(new_point);      
+						//alert("adsada");                 
 					}
-					//alert("123344");
+					                     
 				}
+function SetSpeedAndDirection(speed1,direction1)
+{
+
+	
+	document.getElementById( "speed" ).value=speed1;
+	document.getElementById( "direction" ).value=direction1;
+	
+	//alert(speed1+","+direction1);
+}
 </script>
 </html>

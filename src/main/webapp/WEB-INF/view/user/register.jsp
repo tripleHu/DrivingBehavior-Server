@@ -19,7 +19,7 @@
 <input type="text" name="username" placeholder="用户名" value="${username }" style="width: 100%; height: 100%; font-size: 24px;">${nameError}
 </div>
 <div style="position:absolute; top:58%;left:30%;width:40%;">
-<input type="text" name="code" placeholder="密码" value="${code}" style="width: 100%; height: 100%; font-size: 24px;">${codeError}
+<input type="password" name="code" placeholder="密码" value="${code}" style="width: 100%; height: 100%; font-size: 24px;">${codeError}
 </div>
 <div style="position:absolute; top:70%;left:30%;width:40%;height: 5%">
 <input type="submit" value="注册" style="width: 100%; height: 50px; font: 幼圆;">
