@@ -68,7 +68,7 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
     });
 }
 </script>
-<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.5&ak=QQO985xOjQfV6NLcDtuMSPVN">
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=QQO985xOjQfV6NLcDtuMSPVN">
 //v1.5版本的引用方式：src="http://api.map.baidu.com/api?v=1.5&ak=您的密钥"
 //v1.4版本及以前版本的引用方式：src="http://api.map.baidu.com/api?v=1.4&key=您的密钥&callback=initialize"	
 </script>
@@ -82,8 +82,8 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
     </div>
 <div id="top_info">
     
-    <input type="text" name="speed" value="0" style="width: 100%; height: 100%; font-size: 70px;"id="speed";>
-    <input type="text" name="direction" value="0" style="width: 100%; height: 100%; font-size: 70px;"id="direction";>
+    <input type="text" name="speed" value="0" style="width: 100%; height: 100%; font-size: 30px;"id="speed";>
+    <input type="text" name="direction" value="0" style="width: 100%; height: 100%; font-size: 30px;"id="direction";>
     
      </div>
     <div id="bottom_nav">
@@ -110,31 +110,109 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
 </div>
 </body>
 <script type="text/javascript"> 
+				var points=new Array();//创建数组记录坐标点
 				var map = new BMap.Map("map1");          // 创建地图实例  
 				var point = new BMap.Point(116.404, 39.915);  // 创建点坐标  
 				map.centerAndZoom(point, 15);                 // 初始化地图，设置中心点坐标和地图级别
 				// 用经纬度设置地图中心点
-function theLocation(longitude,latitude)
-				{
+				var vectorFCArrow = new BMap.Marker(point, {
+  				// 初始化方向向上的闭合箭头
+ 				 icon: new BMap.Symbol(BMap_Symbol_SHAPE_FORWARD_CLOSED_ARROW, {
+    			scale: 2,
+    			strokeWeight: 1,
+   				 rotation:0,//顺时针旋转
+   				 fillColor: 'red',
+    			fillOpacity: 0.8
+    			})
+});
+				var vectorFCArrowGPS = new BMap.Marker(point, {
+	  				// 初始化方向向上的闭合箭头
+	 				 icon: new BMap.Symbol(BMap_Symbol_SHAPE_FORWARD_CLOSED_ARROW, {
+	    			scale: 2,
+	    			strokeWeight: 1,
+	   				 rotation:0,//顺时针旋转
+	   				 fillColor: 'red',
+	    			fillOpacity: 0.8
+	    			})
+	});
+				
+function theLocation(longitude,latitude,orientation)
+{
+	
 					if(longitude!= "" &&latitude != "")
 					{
-						map.clearOverlays(); 
-						var new_point = new BMap.Point(longitude,latitude);
-						var marker = new BMap.Marker(new_point);  // 创建标注
-						map.addOverlay(marker);              // 将标注添加到地图中
-						map.panTo(new_point);      
-						//alert("adsada");                 
+						
+						//map.removeOverlay(vectorFCArrowGPS); 
+						//map.removeOverlay(vectorFCArrow); 
+						map.clearOverlays();
+						//alert("asdas");
+						point = new BMap.Point(longitude,latitude);
+						vectorFCArrow = new BMap.Marker(point, {
+							  // 初始化方向向上的闭合箭头
+							  icon: new BMap.Symbol(BMap_Symbol_SHAPE_FORWARD_CLOSED_ARROW, {
+							    scale: 2,
+							    strokeWeight: 1,
+							    rotation:orientation,//顺时针旋转
+							    fillColor: 'red',
+							    fillOpacity: 0.8
+							  })
+							});
+						RecordPonints(point);                                  //记录并绘制路径
+						map.addOverlay(vectorFCArrow);              //将标注添加到地图中
+						//map.addOverlay(vectorFCArrowGPS);              //将标注添加到地图中
+						map.panTo(point);      
+						
 					}
 					                     
-				}
+}
 function SetSpeedAndDirection(speed1,direction1)
 {
-
-	
 	document.getElementById( "speed" ).value=speed1;
 	document.getElementById( "direction" ).value=direction1;
 	
+	vectorFCArrowGPS = new BMap.Marker(new BMap.Point(point.lng-0.001,point.lat), {
+		  // 初始化方向向上的闭合箭头
+		  icon: new BMap.Symbol(BMap_Symbol_SHAPE_FORWARD_CLOSED_ARROW, {
+		    scale: 2,
+		    strokeWeight: 1,
+		    rotation:direction1,//顺时针旋转
+		    fillColor: 'red',
+		    fillOpacity: 0.8
+		  })
+		});
 	//alert(speed1+","+direction1);
 }
-</script>
+function RecordPonints(point)
+{
+	if(points.length==0)
+	{
+		points.push(point);
+	}
+	else
+	{
+		var index=points.length-1;
+		if(points[index].equals(point))
+		{
+		}
+		else
+		{
+			points.push(point);
+			var pointss=[points[index],point];
+			//alert(points[index]);
+			var line=new BMap.Polyline(points, {strokeColor:"blue", strokeWeight:3, strokeOpacity:0.5}); 
+			//alert("OK");
+			map.addOverlay(line);
+		}
+	}
+}
+function test()
+{
+	
+	for(i=0;i<500;i++)
+		{
+			theLocation(106.300322+i*0.0001,29.604529,0);
+		}
+	//alert(map.getOverlays().length);
+}
+</script >
 </html>

@@ -1,6 +1,8 @@
 package com.triple.DrivingBehavior.domain;
 
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,13 +22,13 @@ public class DrivingInfo
 		private long id;
 	//时间
 		@Column(length=20,nullable=false,unique=false)
-		private String time;
+		private Date time;
 	//GPS位置经度
 		@Column(length=20,nullable=false,unique=false)
-		private float GPSLocation_X;
+		private float longitude;
 	//GPS位置纬度
 	    @Column(length=20,nullable=false,unique=false)
-		private float GPSLocation_Y;
+		private float latitude;
 	//速度
 		@Column(length=20,nullable=false,unique=false)
 		private float velocity;
@@ -43,23 +45,11 @@ public class DrivingInfo
 		public void setId(long id) {
 			this.id = id;
 		}
-		public String getTime() {
+		public Date getTime() {
 			return time;
 		}
-		public void setTime(String time) {
+		public void setTime(Date time) {
 			this.time = time;
-		}
-		public float getGPSLocation_X() {
-			return GPSLocation_X;
-		}
-		public void setGPSLocation_X(float gPSLocation_X) {
-			GPSLocation_X = gPSLocation_X;
-		}
-		public float getGPSLocation_Y() {
-			return GPSLocation_Y;
-		}
-		public void setGPSLocation_Y(float gPSLocation_Y) {
-			GPSLocation_Y = gPSLocation_Y;
 		}
 		public float getVelocity() {
 			return velocity;
@@ -78,5 +68,17 @@ public class DrivingInfo
 		}
 		public void setUser(User user) {
 			this.user = user;
+		}
+		public float getLongitude() {
+			return longitude;
+		}
+		public void setLongitude(float longitude) {
+			this.longitude = longitude;
+		}
+		public float getLatitude() {
+			return latitude;
+		}
+		public void setLatitude(float latitude) {
+			this.latitude = latitude;
 		}
 }

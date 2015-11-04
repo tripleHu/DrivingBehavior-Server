@@ -8,7 +8,7 @@
 <title>注册</title>
 <style> 
             body{margin:0; padding:0;} 
-            #a{width:100%; height:100%; background-color:gray;} 
+            
  </style>
 </head>
 <body>
