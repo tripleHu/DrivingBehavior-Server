@@ -113,6 +113,9 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
 				var points=new Array();//创建数组记录坐标点
 				var map = new BMap.Map("map1");          // 创建地图实例  
 				var point = new BMap.Point(116.404, 39.915);  // 创建点坐标  
+				var username=getUrlParam("username");
+				var speed=1;
+		        var orientation=1;
 				map.centerAndZoom(point, 15);                 // 初始化地图，设置中心点坐标和地图级别
 				// 用经纬度设置地图中心点
 				var vectorFCArrow = new BMap.Marker(point, {
@@ -135,13 +138,49 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
 	    			fillOpacity: 0.8
 	    			})
 	});
-				
-function theLocation(longitude,latitude,orientation)
+	$(document).ready(function(){
+				 setInterval("myInterval()",5000);//1000为1秒钟  
+	});
+
+function myInterval()
 {
-	
+	orientation=a;
+	//alert(a);
+	if(speed>0)
+		{
+		//alert(speed+","+orientation);
+		
+					$.ajax
+						    ({
+			            	type:"POST",
+			            	  //dataType:"json",
+			            	  cache:false,
+			            	  url:"recordLocation.json",
+			            	  data:{longitude:point.lng,latitude:point.lat,velocity: speed,orientation: a,username:username},
+			            	  //contentType:"application/json",
+			            	  error: function(XMLHttpRequest, textStatus, errorThrown) {
+			                        alert(XMLHttpRequest.status);
+			                        alert(XMLHttpRequest.readyState);
+			                        alert(textStatus);
+			            	  },
+			            	  success:function(res){
+			            	      //alert(res)
+			            	  }
+			            	 
+
+			            });
+		}
+					//alert("sddd");
+}
+
+
+function theLocation(longitude,latitude,orienta)
+{
+	orientation=orienta;
+	a=orienta;
 					if(longitude!= "" &&latitude != "")
 					{
-						
+
 						//map.removeOverlay(vectorFCArrowGPS); 
 						//map.removeOverlay(vectorFCArrow); 
 						map.clearOverlays();
@@ -152,7 +191,7 @@ function theLocation(longitude,latitude,orientation)
 							  icon: new BMap.Symbol(BMap_Symbol_SHAPE_FORWARD_CLOSED_ARROW, {
 							    scale: 2,
 							    strokeWeight: 1,
-							    rotation:orientation,//顺时针旋转
+							    rotation: orienta,//顺时针旋转
 							    fillColor: 'red',
 							    fillOpacity: 0.8
 							  })
@@ -163,10 +202,13 @@ function theLocation(longitude,latitude,orientation)
 						map.panTo(point);      
 						
 					}
-					                     
+					
 }
+
 function SetSpeedAndDirection(speed1,direction1)
 {
+	speed=speed1;
+	//orientation=direction1;
 	document.getElementById( "speed" ).value=speed1;
 	document.getElementById( "direction" ).value=direction1;
 	
@@ -184,6 +226,7 @@ function SetSpeedAndDirection(speed1,direction1)
 }
 function RecordPonints(point)
 {
+	
 	if(points.length==0)
 	{
 		points.push(point);
@@ -214,5 +257,11 @@ function test()
 		}
 	//alert(map.getOverlays().length);
 }
+function getUrlParam(name)
+{
+var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+if (r!=null) return unescape(r[2]); return null; //返回参数值
+} 
 </script >
 </html>

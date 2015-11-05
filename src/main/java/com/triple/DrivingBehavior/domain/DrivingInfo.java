@@ -25,10 +25,10 @@ public class DrivingInfo
 		private Date time;
 	//GPS位置经度
 		@Column(length=20,nullable=false,unique=false)
-		private float longitude;
+		private double longitude;
 	//GPS位置纬度
 	    @Column(length=20,nullable=false,unique=false)
-		private float latitude;
+		private double latitude;
 	//速度
 		@Column(length=20,nullable=false,unique=false)
 		private float velocity;
@@ -69,16 +69,16 @@ public class DrivingInfo
 		public void setUser(User user) {
 			this.user = user;
 		}
-		public float getLongitude() {
+		public double getLongitude() {
 			return longitude;
 		}
-		public void setLongitude(float longitude) {
+		public void setLongitude(double longitude) {
 			this.longitude = longitude;
 		}
-		public float getLatitude() {
+		public double getLatitude() {
 			return latitude;
 		}
-		public void setLatitude(float latitude) {
+		public void setLatitude(double latitude) {
 			this.latitude = latitude;
 		}
 }
