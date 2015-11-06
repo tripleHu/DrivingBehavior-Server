@@ -1,6 +1,9 @@
 package com.triple.DrivingBehavior.controllers;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,5 +36,19 @@ public String recordLocation( double longitude,double latitude,float velocity,fl
 	info.setUser(drivingInfoCRUD.getUser(username));
 	drivingInfoCRUD.add(info);
 	return "1";
+}
+@RequestMapping(value="/demo/getDrivingInfoByTime.json")
+@ResponseBody 
+public List<DrivingInfo> getDrivingInfoByTime(long starttime,long endtime,String username)
+{
+	Date ST=new Date(starttime);
+	Date ET=new Date(endtime);
+	Date nowDate=new Date();
+	System.out.println(ST);
+	System.out.println(ET);
+	System.out.println(nowDate);
+	List<DrivingInfo>infos=drivingInfoCRUD.getInfobyTime(ST, ET, username);
+	System.out.println(infos.size());
+	return infos;
 }
 }

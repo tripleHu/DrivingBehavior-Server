@@ -81,26 +81,20 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
         </div>
     </div>
 <div id="top_info">
-    
-    <input type="text" name="speed" value="0" style="width: 100%; height: 100%; font-size: 30px;"id="speed";>
-    <input type="text" name="direction" value="0" style="width: 100%; height: 100%; font-size: 30px;"id="direction";>
-    
+    <input type="text" name="speed" value="0" style="width: 100%; height: 50%; font-size: 30px;"id="speed">
+    <input type="text" name="direction" value="0" style="width: 100%; height: 50%; font-size: 30px;"id="direction">
+     </div>
+     <div id="path_panels">
      </div>
     <div id="bottom_nav">
         <div class="icons_nav">
                 <div class="paginated"> <!--Remove this DIV if you want to remove the pagination-->
                         <ul class="slides">
                             <li>
-                                <a href="about.html"  class="icon"><img src="/DrivingBehavior/resources/images/icons/icon_about.png"  alt="" title="" border="0" /><span>About</span></a>
-                                <a href="services.html"  class="icon"><img src="/DrivingBehavior/resources/images/icons/icon_services.png"  alt="" title="" border="0" /><span>Services</span></a>
-                                <a href="blog.html"  class="icon"><img src="/DrivingBehavior/resources/images/icons/icon_blog.png"  alt="" title="" border="0" /><span>Blog</span></a>
-                                <a href="portfolio.html"  class="icon"><img src="/DrivingBehavior/resources/images/icons/icon_portfolio.png"  alt="" title="" border="0" /><span>Portfolio</span></a>
-                            </li>
-                            <li>
-                                <a href="photos.html"  class="icon"><img src="/DrivingBehavior/resources/images/icons/icon_photos.png"  alt="" title="" border="0" /><span>Photos</span></a>
-                                <a href="videos.html"  class="icon"><img src="/DrivingBehavior/resources/images/icons/icon_video.png"  alt="" title="" border="0" /><span>Videos</span></a>
-                                <a href="clients.html"  class="icon"><img src="/DrivingBehavior/resources/images/icons/icon_clients.png"  alt="" title="" border="0" /><span>Clients</span></a>
-                                <a href="contact.html"  class="icon"><img src="/DrivingBehavior/resources/images/icons/icon_contact.png"  alt="" title="" border="0" /><span>Contact</span></a>
+                                <a href="javascript:;" onclick="HideDiv1()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>实时</span></a>
+                                <a href="javascript:;" onclick="HideDiv2()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>统计</span></a>
+                                <a href="javascript:;" onclick="HideDiv3()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>路径</span></a>
+                                <a href="javascript:;" onclick="getPath()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>我的</span></a>
                             </li>
                         </ul>
                 </div>  <!--Remove this DIV if you want to remove the pagination-->
@@ -111,12 +105,15 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
 </body>
 <script type="text/javascript"> 
 				var points=new Array();//创建数组记录坐标点
+				
 				var map = new BMap.Map("map1");          // 创建地图实例  
+				var pathmap = new BMap.Map("path_panels");          // 创建地图实例  
 				var point = new BMap.Point(116.404, 39.915);  // 创建点坐标  
 				var username=getUrlParam("username");
 				var speed=1;
 		        var orientation=1;
-				map.centerAndZoom(point, 15);                 // 初始化地图，设置中心点坐标和地图级别
+				map.centerAndZoom(point, 15);                 //初始化地图，设置中心点坐标和地图级别
+				pathmap.centerAndZoom(point, 18);
 				// 用经纬度设置地图中心点
 				var vectorFCArrow = new BMap.Marker(point, {
   				// 初始化方向向上的闭合箭头
@@ -138,7 +135,11 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
 	    			fillOpacity: 0.8
 	    			})
 	});
+				
+				var myIconStart = new BMap.Icon("/DrivingBehavior/resources/images/icons/start.png", new BMap.Size(37,62));
+				var myIconEnd  = new BMap.Icon("/DrivingBehavior/resources/images/icons/end.png", new BMap.Size(37,62));
 	$(document).ready(function(){
+				HideDiv1();
 				 setInterval("myInterval()",5000);//1000为1秒钟  
 	});
 
@@ -159,9 +160,9 @@ function myInterval()
 			            	  data:{longitude:point.lng,latitude:point.lat,velocity: speed,orientation: a,username:username},
 			            	  //contentType:"application/json",
 			            	  error: function(XMLHttpRequest, textStatus, errorThrown) {
-			                        alert(XMLHttpRequest.status);
-			                        alert(XMLHttpRequest.readyState);
-			                        alert(textStatus);
+			                        //alert(XMLHttpRequest.status);
+			                        //alert(XMLHttpRequest.readyState);
+			                       // alert(textStatus);
 			            	  },
 			            	  success:function(res){
 			            	      //alert(res)
@@ -257,11 +258,74 @@ function test()
 		}
 	//alert(map.getOverlays().length);
 }
+function HideDiv1()
+{
+	alert("HideDiv1");
+	document.getElementById("main_panels").style.display ="block";
+	document.getElementById("top_info").style.display ="block";
+	document.getElementById("path_panels").style.display ="none";
+}
+function HideDiv2()
+{
+	alert("HideDiv2");
+	document.getElementById("main_panels").style.display ="none";
+	document.getElementById("top_info").style.display ="none";
+	document.getElementById("path_panels").style.display ="none";
+}
+function HideDiv3()
+{
+	alert("HideDiv3");
+	document.getElementById("path_panels").style.display ="block";
+	document.getElementById("main_panels").style.display ="none";
+	document.getElementById("top_info").style.display ="none";
+}
 function getUrlParam(name)
 {
 var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
 var r = window.location.search.substr(1).match(reg);  //匹配目标参数
 if (r!=null) return unescape(r[2]); return null; //返回参数值
 } 
+function getPath()
+{
+	starttime=Date.UTC(2015,11-1,6,20,0,0)-8*3600*1000; 
+	endtime=Date.UTC(2015,11-1,6,20,30,0)-8*3600*1000; 
+	var pathpoints=new Array();//创建数组记录坐标点
+	$.ajax
+    ({
+	//type:"POST",
+	  //dataType:"json",
+	  cache:true,
+	  url:"getDrivingInfoByTime.json",
+	  data:{starttime:starttime,endtime:endtime,username:username},
+	  //contentType:"application/json",
+	  error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert(XMLHttpRequest.status);
+            alert(XMLHttpRequest.readyState);
+           alert(textStatus);
+	  },
+	  success:function(res){
+	      alert("OK"+res.length);
+	        for(var i=0;i<res.length;i++)
+	    	{
+	        		var temp_point=new BMap.Point(res[i].longitude, res[i].latitude);
+	      			pathpoints.push(temp_point);
+	    	}
+	        var line=new BMap.Polyline(pathpoints, {strokeColor:"blue", strokeWeight:3, strokeOpacity:0.5}); 
+	        var Startmarker = new BMap.Marker(pathpoints[0],{icon:myIconStart}); //创建标注
+	        var Endmarker = new BMap.Marker(pathpoints[pathpoints.length-1],{icon:myIconEnd});
+	          pathmap.addOverlay(Startmarker);
+	          pathmap.addOverlay(Endmarker);
+    		  pathmap.addOverlay(line);
+    		  pathmap.centerAndZoom(pathpoints[pathpoints.length-1],15); 
+    		  pathmap.panTo(pathpoints[pathpoints.length-1]);      
+	  }
+	 
+});
+	//alert(pathpoints.length);
+	if(pathpoints.length>0)
+		{
+	 
+		}
+}
 </script >
 </html>

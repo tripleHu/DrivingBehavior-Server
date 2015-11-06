@@ -1,6 +1,9 @@
 package com.triple.DrivingBehavior.services.hibernate;
 
+import java.util.Date;
 import java.util.List;
+
+import javax.persistence.criteria.From;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +83,15 @@ public class DrivingInfoCRUDHibernate implements DrivingInfoCRUD{
 			return users.get(0);
 		else
 			return null;
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DrivingInfo> getInfobyTime(Date StartTime,Date EndTime,String Name)
+	{
+		List<User> users=(List<User>)ht.find("from User where username=?", Name);
+		User user=users.get(0);
+		List<DrivingInfo> infos=(List<DrivingInfo>)ht.find("from DrivingInfo where time>? and time<? and user_id=?",StartTime,EndTime,user.getId());
+		return infos;
 	}
 	@Override
 	@Transactional

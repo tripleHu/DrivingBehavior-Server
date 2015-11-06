@@ -1,5 +1,6 @@
 package com.triple.DrivingBehavior.services;
 
+import java.util.Date;
 import java.util.List;
 
 import com.triple.DrivingBehavior.domain.DrivingInfo;
@@ -15,6 +16,7 @@ public List<DrivingInfo> getByUserId(long id);
 public List<DrivingInfo> getByUserName(String Name);
 public List<DrivingInfo> getAll();
 public User getUser(String Name);
+public List<DrivingInfo> getInfobyTime(Date StartTime,Date EndTime,String Name);
 public void deleteById(Long id);
 public void deleteByUserName(String name);
 }

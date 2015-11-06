@@ -3,7 +3,11 @@ package com.triple.DrivingBehavior.services.hibernate;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.junit.After;
@@ -232,5 +236,16 @@ public class DrivingInfoCRUDHibernateTest
 		DrivingInfo c2=infoCRUD.getById(info1.getId());
 		assertEquals(null,c1);
 		assertEquals(null,c2);
+	}
+	@Test
+	public void testgetInfobyTime()
+	{
+		//DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		//Date starttime = dateFormat.parse("2010-09-13 22:36:01");
+		Calendar c = new GregorianCalendar(2015,11,6,18,40,0); 
+		Date starttime=c.getTime();
+		c= new GregorianCalendar(2015,11,6,19,30,0); 
+		Date endtime=c.getTime();
+		System.out.println(starttime+"----"+endtime);
 	}
 }
