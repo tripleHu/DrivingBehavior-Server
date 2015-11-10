@@ -103,7 +103,8 @@ border-top:1px #919191 solid;}
 #pages_nav{ height:auto; width:100%; position:absolute; top:-200px; left:0px; z-index:888;}
 /*Info
 /*-------------------------------------------*/
-#top_info{position:absolute; top:0px; left:0px; background:url("/DrivingBehavior/resources/images/nav_bg.png") repeat-x top;height:10%; width:100%;; }
+.top_info{position:absolute; top:0px; left:0px; background:url("/DrivingBehavior/resources/images/nav_bg.png") repeat-x top;height:10%; width:100%;; }
+#btn_search_path{  position:absolute; right:0;top:20%}
 /* Content images
 /*------------------------------------------*/
 .content img.rounded{max-width:96%; display: block; 

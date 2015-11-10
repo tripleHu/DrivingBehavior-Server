@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no"> 
 <title>注册</title>
 <style> 
-            body{margin:0; padding:0;} 
-            
+            body{margin:0; padding:0;background-color:RGB(190,190,190);} 
+ }     
  </style>
 </head>
 <body>

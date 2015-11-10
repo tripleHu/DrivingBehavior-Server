@@ -80,11 +80,48 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
         <div class="panels_slider" id="map1">
         </div>
     </div>
-<div id="top_info">
+<div class="top_info" id="top_panel">
     <input type="text" name="speed" value="0" style="width: 100%; height: 50%; font-size: 30px;"id="speed">
     <input type="text" name="direction" value="0" style="width: 100%; height: 50%; font-size: 30px;"id="direction">
      </div>
      <div id="path_panels">
+     	<div class="top_info">
+     	<nobr style="width: 100% ;height:100%;position:absolute; top:5% left:5%">
+     	<input type="date" style="width:25% ;height:90%;" id="time_filed"/>
+     	从<input type="time" placeholder="0：00" style="width:25%; height:90%;" id="path_starttime" />
+     	到<input type="time" placeholder="24：00"  style="width:25% ;height:90%;"id="path_endtime"/>
+     	<input  type="image"  name="search_path" id="btn_search_path" value="" src="/DrivingBehavior/resources/images/icons/search.png" onclick="search_for_path()"/>
+     	</nobr>
+     	<script type="text/javascript">
+					var now = new Date(); 
+					document.getElementById("time_filed").valueAsDate = new Date();
+					function search_for_path()
+					{
+						var date=document.getElementById("time_filed").value;
+						var starttime=document.getElementById("path_starttime").value;
+						var endtime=document.getElementById("path_endtime").value;
+						if(starttime==" "||endtime==" ")
+							{
+							alert("时间不能为空");
+							return;
+							}
+						if(starttime>=endtime)
+							{
+							alert("开始时间必须小于结束时间");
+							return;
+							}
+						//alert(date+","+starttime+","+endtime);
+						var temper1=date+" "+starttime;
+						var dt1 = new Date(temper1.replace(/-/,"/"));
+						var temper2=date+" "+endtime;
+						var dt2 = new Date(temper2.replace(/-/,"/"));
+						//alert(dt1+"--"+dt2);
+						getPath(dt1.getTime(),dt2.getTime());
+					}
+		</script>
+     	</div>
+     	<div id="map_path" style="position: absolute; left:0; top:10%; height:90%; width:100%">
+     	</div>
      </div>
     <div id="bottom_nav">
         <div class="icons_nav">
@@ -94,7 +131,7 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
                                 <a href="javascript:;" onclick="HideDiv1()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>实时</span></a>
                                 <a href="javascript:;" onclick="HideDiv2()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>统计</span></a>
                                 <a href="javascript:;" onclick="HideDiv3()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>路径</span></a>
-                                <a href="javascript:;" onclick="getPath()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>我的</span></a>
+                                <a href="javascript:;" onclick="" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>我的</span></a>
                             </li>
                         </ul>
                 </div>  <!--Remove this DIV if you want to remove the pagination-->
@@ -107,11 +144,11 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
 				var points=new Array();//创建数组记录坐标点
 				
 				var map = new BMap.Map("map1");          // 创建地图实例  
-				var pathmap = new BMap.Map("path_panels");          // 创建地图实例  
+				var pathmap = new BMap.Map("map_path");          // 创建地图实例  
 				var point = new BMap.Point(116.404, 39.915);  // 创建点坐标  
 				var username=getUrlParam("username");
 				var speed=1;
-		        var orientation=1;
+		        var orientations=1;
 				map.centerAndZoom(point, 15);                 //初始化地图，设置中心点坐标和地图级别
 				pathmap.centerAndZoom(point, 18);
 				// 用经纬度设置地图中心点
@@ -138,15 +175,18 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
 				
 				var myIconStart = new BMap.Icon("/DrivingBehavior/resources/images/icons/start.png", new BMap.Size(37,62));
 				var myIconEnd  = new BMap.Icon("/DrivingBehavior/resources/images/icons/end.png", new BMap.Size(37,62));
+				
 	$(document).ready(function(){
 				HideDiv1();
+				
 				 setInterval("myInterval()",5000);//1000为1秒钟  
 	});
 
 function myInterval()
 {
-	orientation=a;
+	orientations=a;
 	//alert(a);
+	//alert(orientations);
 	if(speed>0)
 		{
 		//alert(speed+","+orientation);
@@ -177,11 +217,12 @@ function myInterval()
 
 function theLocation(longitude,latitude,orienta)
 {
-	orientation=orienta;
+	orientations=orienta;
+	//alert(orientation);
 	a=orienta;
 					if(longitude!= "" &&latitude != "")
 					{
-
+						BMap.getDistance
 						//map.removeOverlay(vectorFCArrowGPS); 
 						//map.removeOverlay(vectorFCArrow); 
 						map.clearOverlays();
@@ -198,6 +239,7 @@ function theLocation(longitude,latitude,orienta)
 							  })
 							});
 						RecordPonints(point);                                  //记录并绘制路径
+						
 						map.addOverlay(vectorFCArrow);              //将标注添加到地图中
 						//map.addOverlay(vectorFCArrowGPS);              //将标注添加到地图中
 						map.panTo(point);      
@@ -211,7 +253,7 @@ function SetSpeedAndDirection(speed1,direction1)
 	speed=speed1;
 	//orientation=direction1;
 	document.getElementById( "speed" ).value=speed1;
-	document.getElementById( "direction" ).value=direction1;
+	//document.getElementById( "direction" ).value=direction1;
 	
 	vectorFCArrowGPS = new BMap.Marker(new BMap.Point(point.lng-0.001,point.lat), {
 		  // 初始化方向向上的闭合箭头
@@ -236,17 +278,21 @@ function RecordPonints(point)
 	{
 		var index=points.length-1;
 		if(points[index].equals(point))
-		{
-		}
+			{
+			
+			}
 		else
-		{
+			{
+			var a=map.getDistance(points[index],point)+document.getElementById( "direction" ).value;
+			document.getElementById( "direction" ).value=parseFloat(a);
 			points.push(point);
-			var pointss=[points[index],point];
+			//var pointss=[points[index],point];
 			//alert(points[index]);
 			var line=new BMap.Polyline(points, {strokeColor:"blue", strokeWeight:3, strokeOpacity:0.5}); 
 			//alert("OK");
 			map.addOverlay(line);
-		}
+			}
+		
 	}
 }
 function test()
@@ -262,22 +308,23 @@ function HideDiv1()
 {
 	alert("HideDiv1");
 	document.getElementById("main_panels").style.display ="block";
-	document.getElementById("top_info").style.display ="block";
+	document.getElementById("top_panel").style.display ="block";
 	document.getElementById("path_panels").style.display ="none";
 }
 function HideDiv2()
 {
 	alert("HideDiv2");
 	document.getElementById("main_panels").style.display ="none";
-	document.getElementById("top_info").style.display ="none";
+	document.getElementById("top_panel").style.display ="none";
 	document.getElementById("path_panels").style.display ="none";
 }
 function HideDiv3()
 {
+	document.title ="查询路径";
 	alert("HideDiv3");
 	document.getElementById("path_panels").style.display ="block";
 	document.getElementById("main_panels").style.display ="none";
-	document.getElementById("top_info").style.display ="none";
+	document.getElementById("top_panel").style.display ="none";
 }
 function getUrlParam(name)
 {
@@ -285,10 +332,12 @@ var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标
 var r = window.location.search.substr(1).match(reg);  //匹配目标参数
 if (r!=null) return unescape(r[2]); return null; //返回参数值
 } 
-function getPath()
+function getPath(start,end)
 {
-	starttime=Date.UTC(2015,11-1,6,20,0,0)-8*3600*1000; 
-	endtime=Date.UTC(2015,11-1,6,20,30,0)-8*3600*1000; 
+	//starttime=Date.UTC(2015,11-1,6,20,0,0)-8*3600*1000; 
+	//endtime=Date.UTC(2015,11-1,6,20,30,0)-8*3600*1000; 
+	var starttime=start;
+	var endtime=end;
 	var pathpoints=new Array();//创建数组记录坐标点
 	$.ajax
     ({
@@ -299,20 +348,33 @@ function getPath()
 	  data:{starttime:starttime,endtime:endtime,username:username},
 	  //contentType:"application/json",
 	  error: function(XMLHttpRequest, textStatus, errorThrown) {
+		  alert("查询失败");
             alert(XMLHttpRequest.status);
             alert(XMLHttpRequest.readyState);
            alert(textStatus);
 	  },
 	  success:function(res){
-	      alert("OK"+res.length);
+	      if(res.length<=1)
+	    	  {
+	    	  alert("无相关信息");
+	    	  return;
+	    	  }
+	      //alert("查询成功");
 	        for(var i=0;i<res.length;i++)
 	    	{
 	        		var temp_point=new BMap.Point(res[i].longitude, res[i].latitude);
 	      			pathpoints.push(temp_point);
 	    	}
+	        var path_distance=0;
+	        for(var b=0;b<pathpoints.length-1;b++)
+	    	{
+	        	path_distance+=pathmap.getDistance(pathpoints[b],pathpoints[b+1]);
+	    	}
+	        alert("查询成功,距离为："+path_distance.toFixed(2)+"米");
 	        var line=new BMap.Polyline(pathpoints, {strokeColor:"blue", strokeWeight:3, strokeOpacity:0.5}); 
 	        var Startmarker = new BMap.Marker(pathpoints[0],{icon:myIconStart}); //创建标注
 	        var Endmarker = new BMap.Marker(pathpoints[pathpoints.length-1],{icon:myIconEnd});
+	          pathmap.clearOverlays();
 	          pathmap.addOverlay(Startmarker);
 	          pathmap.addOverlay(Endmarker);
     		  pathmap.addOverlay(line);

@@ -4,14 +4,15 @@
 <html>
 <head>
 <style> 
-            body{margin:0; padding:0;} 
+            body{margin:0; padding:0;background-color:RGB(190,190,190);} 
+ }     
  </style>
 <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no"> 
 <title>DrivingBehavior登录</title>
 </head>
 
 <body>
-<img src="resources/page2.png" width="100%" height="100%" usemap="#Map" />
+<img src="resources/page2.png" width="100%" height="100%" usemap="#Map"  id="main"/>
 <map name="Map">
   <area shape="rect"  href="user/login" target="_parent" id="a">
   <area shape="rect"  href="user/reg" target="_parent" id="b">
@@ -22,6 +23,7 @@
 window.onload=change;
 window.onresize = change;
 function change(){
+	
 	 var a=document.body.clientWidth/480;
 	 var b=document.body.clientHeight/800;
 	 var c1="";
