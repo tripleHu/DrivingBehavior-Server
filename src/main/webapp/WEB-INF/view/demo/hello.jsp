@@ -5,21 +5,23 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<link rel="apple-touch-icon" sizes="114x114" href="/DrivingBehavior/resources/images/apple-touch-icon.png" />
-<link rel="apple-touch-startup-image" href="/DrivingBehavior/resources/images/apple-touch-startup-image.png" />
-<meta name="author" content="FamousThemes" />
-<meta name="description" content="My Mobile Page Version 3 Template" />
-<meta name="keywords" content="mobile templates, mobile wordpress themes, mobile themes, my mobile page, premium css templates, premium wordpress themes" />
+
 <title>My Mobile Page V3</title>
 
 <!-- Main CSS file -->
 <link rel="stylesheet" href="/DrivingBehavior/resources/css/style.css"  type="text/css" media="screen" />
 <!-- jQuery file -->
-<script src="/DrivingBehavior/resources/js/jquery.min.js" ></script>
+<script src="/DrivingBehavior/resources/js/jquery-1.8.3.min.js" ></script>
 <!-- FlexSlider -->
 <script src="/DrivingBehavior/resources/js/jquery.flexslider.js" ></script>
+<!-- MobileBone CSS file-->
+<link rel="stylesheet" href="/DrivingBehavior/resources/css/mobilebone.css">
+<!-- MobileBone JS file-->
+<script src="/DrivingBehavior/resources/js/mobilebone.js"></script>
+<!-- PopupBox CSS file-->
+<link rel="Stylesheet" type="text/css" href="/DrivingBehavior/resources/css/PopupBox.css" />
+<!-- Star CSS file-->
+<link rel="stylesheet" href="/DrivingBehavior/resources/css/Starstyle.css"  type="text/css" />
 <script type="text/javascript">
 var $ = jQuery.noConflict();
 $(window).load(function() {
@@ -42,32 +44,6 @@ $(window).load(function() {
 	});
 });
 </script>
-<!-- Hide Mobiles Browser Navigation Bar -->
-<script type="text/javascript">
-	window.addEventListener("load",function() {
-	// Set a timeout...
-	setTimeout(function(){
-	// Hide the address bar!
-	window.scrollTo(0, 1);
-	}, 0);
-	});
-</script>
-<!-- Hide on iphone top browser element | only on home page -->
-<script type="text/javascript">
-if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
-    $(window).load(function() {
-       $("body").removeClass("home");
-
-       // Check to see if the window is running in app mode. 
-       // If it is not, then it is running in full screen mode
-        if ( ("standalone" in window.navigator) && !window.navigator.standalone    ){
-            $("body").addClass("homeiphone_app");
-        } else {
-            $("body").addClass("homeiphone_full");
-        }
-    });
-}
-</script>
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=QQO985xOjQfV6NLcDtuMSPVN">
 //v1.5版本的引用方式：src="http://api.map.baidu.com/api?v=1.5&ak=您的密钥"
 //v1.4版本及以前版本的引用方式：src="http://api.map.baidu.com/api?v=1.4&key=您的密钥&callback=initialize"	
@@ -75,8 +51,8 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
 </head>
 <body class="home">
 <div id="container">
-
-    <div id="main_panels">
+<div id="page_realtime" class="page out"  >
+    <div id="main_panels" >
         <div class="panels_slider" id="map1">
         </div>
     </div>
@@ -84,7 +60,70 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
     <input type="text" name="speed" value="0" style="width: 100%; height: 50%; font-size: 30px;"id="speed">
     <input type="text" name="direction" value="0" style="width: 100%; height: 50%; font-size: 30px;"id="direction">
      </div>
-     <div id="path_panels">
+     </div>
+     <div id="page_information" class="page out" >
+     <a href="#" id="example">请选择查询时间</a>
+	
+    <div id="TimeSelectBox">
+        <div class="row1">
+            请选择驾驶区间<a href="javascript:void(0)" title="关闭窗口" class="close_btn" id="closeBtn">×</a>
+        </div>
+        <div class="row">
+           日期: <span class="inputBox">
+                <input type="date" id="InfoChooseDate" placeholder="" onchange="AddDrivingTime()"/>
+            </span>
+        </div>
+        <div class="row">
+            时间: <span class="inputBox">
+               
+				<select name="cars" id="InfoTimeInterval" >
+				
+				</select>
+            </span>
+        </div>
+        <div class="row">
+            <a href="javascript:void(0)" onclick="ShowInfo()" id="loginbtn">确定</a>
+        </div>
+    </div>
+    
+	<div id="score">
+<div class="rating rating-5" style="position:absolute; top:0% ;left:30%; margin: 0px 0 ;height:20%;">
+      <i class="star-1">★</i>
+      <i class="star-2">★</i>
+      <i class="star-3">★</i>
+      <i class="star-4">★</i>
+      <i class="star-5">★</i>
+    </div>
+<div style="position:absolute; top:20%; left:33%; height:80%; width:auto">
+<div style=" width:140px; height:140px; background-color:#4490f7; border-radius:50%;">
+         <span style="height:100%; line-height:100%; display:block; color:#FFF; text-align:center; font-size:130px">99</span>
+    </div>
+</div>
+</div>
+<div id="drivingInfo">
+<a href="#" class="Line">驾驶信息</a>
+<ul style="position:absolute;left:10%;top:35%;width:auto;height:auto; font-size:20px">
+<li >重庆大学→重庆大学</li>
+<li >10.88公里</li>
+<li >平均速度：30km/h</li>
+<li >最高速度：60km/h</li>
+</ul>
+</div>
+<div id="IllegalInfo">
+<a href="#page_information_child" class="Line">违章信息</a>
+<ul style="position:absolute;left:10%;top:35%;width:auto;height:auto; font-size:20px">
+<li >汉渝路-超速20%</li>
+<li >大学城中路-超速20%</li>
+<li >大学城中路-超速20%</li>
+<li >大学城中路-超速20%</li>
+<li >大学城中路-超速20%</li>
+<li >大学城中路-超速20%</li>
+<li >大学城中路-超速20%</li>
+</ul>
+</div>
+	
+     </div>
+     <div id="page_path" class="page out">
      	<div class="top_info">
      	<nobr style="width: 100% ;height:100%;position:absolute; top:5% left:5%">
      	<input type="date" style="width:25% ;height:90%;" id="time_filed"/>
@@ -123,15 +162,19 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
      	<div id="map_path" style="position: absolute; left:0; top:10%; height:90%; width:100%">
      	</div>
      </div>
+     <div id="page_my" class="page out" >
+     </div>
+     <div id="page_information_child" class="page out">
+     </div>
     <div id="bottom_nav">
         <div class="icons_nav">
                 <div class="paginated"> <!--Remove this DIV if you want to remove the pagination-->
                         <ul class="slides">
                             <li>
-                                <a href="javascript:;" onclick="HideDiv1()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>实时</span></a>
-                                <a href="javascript:;" onclick="HideDiv2()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>统计</span></a>
-                                <a href="javascript:;" onclick="HideDiv3()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>路径</span></a>
-                                <a href="javascript:;" onclick="" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" /><span>我的</span></a>
+                                <a href="#page_realtime" onclick="HideDiv1()" class="icon"><img src="/DrivingBehavior/resources/images/icons/Real1.png"  alt="" title="" border="0" id="icon_Real"/><span>实时</span></a>
+                                <a href="#page_information" onclick="HideDiv2()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" id="icon_infomation"/><span>统计</span></a>
+                                <a href="#page_path" onclick="HideDiv3()" class="icon"><img src="/DrivingBehavior/resources/images/icons/path1.png"  alt="" title="" border="0" id="icon_path"/><span>路径</span></a>
+                                <a href="#page_my" onclick="HideDiv4()" class="icon"><img src="/DrivingBehavior/resources/images/icons/my1.png"  alt="" title="" border="0" id="icon_my"/><span>我的</span></a>
                             </li>
                         </ul>
                 </div>  <!--Remove this DIV if you want to remove the pagination-->
@@ -145,12 +188,15 @@ if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)
 				
 				var map = new BMap.Map("map1");          // 创建地图实例  
 				var pathmap = new BMap.Map("map_path");          // 创建地图实例  
+				var informationmap = new BMap.Map("page_information_child");          // 创建地图实例  
 				var point = new BMap.Point(116.404, 39.915);  // 创建点坐标  
 				var username=getUrlParam("username");
-				var speed=1;
+				var speed=0;
 		        var orientations=1;
+		        var cur_distance=0;
 				map.centerAndZoom(point, 15);                 //初始化地图，设置中心点坐标和地图级别
 				pathmap.centerAndZoom(point, 18);
+				informationmap.centerAndZoom(point, 18);
 				// 用经纬度设置地图中心点
 				var vectorFCArrow = new BMap.Marker(point, {
   				// 初始化方向向上的闭合箭头
@@ -283,8 +329,11 @@ function RecordPonints(point)
 			}
 		else
 			{
-			var a=map.getDistance(points[index],point)+document.getElementById( "direction" ).value;
-			document.getElementById( "direction" ).value=parseFloat(a);
+			if(speed>0)
+				{
+					cur_distance=map.getDistance(points[index],point)+cur_distance;
+				}
+			document.getElementById( "direction" ).value=cur_distance.toFixed(2)+"米";
 			points.push(point);
 			//var pointss=[points[index],point];
 			//alert(points[index]);
@@ -306,25 +355,48 @@ function test()
 }
 function HideDiv1()
 {
-	alert("HideDiv1");
-	document.getElementById("main_panels").style.display ="block";
-	document.getElementById("top_panel").style.display ="block";
-	document.getElementById("path_panels").style.display ="none";
+	//alert("HideDiv1");
+	document.getElementById("icon_Real").src="/DrivingBehavior/resources/images/icons/Real2.png";
+	document.getElementById("icon_infomation").src="/DrivingBehavior/resources/images/icons/infomation1.png";
+	document.getElementById("icon_path").src="/DrivingBehavior/resources/images/icons/path1.png";
+	document.getElementById("icon_my").src="/DrivingBehavior/resources/images/icons/my1.png";
+	//document.getElementById("main_panels").style.display ="block";
+	//document.getElementById("top_panel").style.display ="block";
+	//document.getElementById("path_panels").style.display ="none";
 }
 function HideDiv2()
 {
-	alert("HideDiv2");
-	document.getElementById("main_panels").style.display ="none";
-	document.getElementById("top_panel").style.display ="none";
-	document.getElementById("path_panels").style.display ="none";
+	//alert("HideDiv2");
+	document.getElementById("icon_Real").src="/DrivingBehavior/resources/images/icons/Real1.png";
+	document.getElementById("icon_infomation").src="/DrivingBehavior/resources/images/icons/infomation2.png";
+	document.getElementById("icon_path").src="/DrivingBehavior/resources/images/icons/path1.png";
+	document.getElementById("icon_my").src="/DrivingBehavior/resources/images/icons/my1.png";
+	//document.getElementById("main_panels").style.display ="none";
+	//document.getElementById("top_panel").style.display ="none";
+	//document.getElementById("path_panels").style.display ="none";
 }
 function HideDiv3()
 {
 	document.title ="查询路径";
-	alert("HideDiv3");
-	document.getElementById("path_panels").style.display ="block";
-	document.getElementById("main_panels").style.display ="none";
-	document.getElementById("top_panel").style.display ="none";
+	//alert("HideDiv3");
+	document.getElementById("icon_Real").src="/DrivingBehavior/resources/images/icons/Real1.png";
+	document.getElementById("icon_infomation").src="/DrivingBehavior/resources/images/icons/infomation1.png";
+	document.getElementById("icon_path").src="/DrivingBehavior/resources/images/icons/path2.png";
+	document.getElementById("icon_my").src="/DrivingBehavior/resources/images/icons/my1.png";
+	//document.getElementById("path_panels").style.display ="block";
+	//document.getElementById("main_panels").style.display ="none";
+	//document.getElementById("top_panel").style.display ="none";
+}
+function HideDiv4()
+{
+	//alert("HideDiv4");
+	document.getElementById("icon_Real").src="/DrivingBehavior/resources/images/icons/Real1.png";
+	document.getElementById("icon_infomation").src="/DrivingBehavior/resources/images/icons/infomation1.png";
+	document.getElementById("icon_path").src="/DrivingBehavior/resources/images/icons/path1.png";
+	document.getElementById("icon_my").src="/DrivingBehavior/resources/images/icons/my2.png";
+	//document.getElementById("main_panels").style.display ="none";
+	//document.getElementById("top_panel").style.display ="none";
+	//document.getElementById("path_panels").style.display ="none";
 }
 function getUrlParam(name)
 {
@@ -390,4 +462,64 @@ function getPath(start,end)
 		}
 }
 </script >
+<script type="text/javascript">
+function AddDrivingTime()
+{
+	for(var i=0;i<document.getElementById("InfoTimeInterval").options.length;) 
+	{ 
+	document.getElementById("InfoTimeInterval").removeChild(document.getElementById("InfoTimeInterval").options[i]); 
+	}
+for(var i=0;i<6;i++)
+	{
+		document.getElementById("InfoTimeInterval").options.add(new Option(i, i));
+	}
+}
+function ShowInfo()
+{
+	if(document.getElementById("InfoChooseDate").value==""||document.getElementById("InfoTimeInterval").value=="")
+	{
+	alert("请选择日期和时间");
+	}
+	else
+	{
+	alert(document.getElementById("InfoTimeInterval").value);
+	document.getElementById("example").innerHTML=document.getElementById("InfoChooseDate").value+" "+document.getElementById("InfoTimeInterval").value;
+	$("#TimeSelectBox").fadeOut("fast");
+	$("#mask").css({ display: 'none' });
+	}
+}
+	$(function ($) {
+		//弹出登录
+		$("#example").hover(function () {
+			$(this).stop().animate({
+				opacity: '1'
+			}, 600);
+		}, function () {
+			$(this).stop().animate({
+				opacity: '0.6'
+			}, 1000);
+		}).on('click', function () {
+			$("body").append("<div id='mask'></div>");
+			$("#mask").addClass("mask").fadeIn("slow");
+			$("#TimeSelectBox").fadeIn("slow");
+		});
+		//
+		//按钮的透明度
+		$("#loginbtn").hover(function () {
+			$(this).stop().animate({
+				opacity: '1'
+			}, 600);
+		}, function () {
+			$(this).stop().animate({
+				opacity: '0.8'
+			}, 1000);
+		});
+		
+		//关闭
+		$(".close_btn").hover(function () { $(this).css({ color: 'black' }) }, function () { $(this).css({ color: '#999' }) }).on('click', function () {
+			$("#TimeSelectBox").fadeOut("fast");
+			$("#mask").css({ display: 'none' });
+		});
+	});
+	</script>	
 </html>
