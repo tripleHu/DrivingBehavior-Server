@@ -57,8 +57,11 @@ $(window).load(function() {
         </div>
     </div>
 <div class="top_info" id="top_panel">
-    <input type="text" name="speed" value="0" style="width: 100%; height: 50%; font-size: 30px;"id="speed">
-    <input type="text" name="direction" value="0" style="width: 100%; height: 50%; font-size: 30px;"id="direction">
+    <ul style="position:absolute; top:0%;width:100%;height:100%; background-color:RGB(255,255,255);">
+ <li class="my_statistics" style="font-size:25px" ><span id="realtime_speed">0km/h</span><br/><span style="color:#000000; font-size:12px">速度</span></li>
+ <li class="my_statistics" style="font-size:25px" ><span id="realtime_time">00:00:00</span><br/><span style="color:#000000; font-size:12px">行驶时间</span></li>
+ <li class="my_statistics" style="font-size:25px" ><span id="realtime_illegal">0次</span><br/><span style="color:#000000; font-size:12px">不良驾驶</span></li>
+ </ul>
      </div>
      </div>
      <div id="page_information" class="page out" >
@@ -101,24 +104,18 @@ $(window).load(function() {
 </div>
 </div>
 <div id="drivingInfo">
-<a href="#" class="Line">驾驶信息</a>
+<a href="#" class="Line"  >驾驶信息</a>
 <ul style="position:absolute;left:10%;top:35%;width:auto;height:auto; font-size:20px">
-<li >重庆大学→重庆大学</li>
-<li >10.88公里</li>
-<li >平均速度：30km/h</li>
-<li >最高速度：60km/h</li>
+<li id="Info_FromTo"></li>
+<li id="Info_distance"></li>
+<li id="Info_speed_avg"></li>
+<li id="Info_speed_max"></li>
 </ul>
 </div>
 <div id="IllegalInfo">
-<a href="#page_information_child" class="Line">违章信息</a>
+<a href="#page_information_child" class="Line">不良驾驶信息</a>
 <ul style="position:absolute;left:10%;top:35%;width:auto;height:auto; font-size:20px">
-<li >汉渝路-超速20%</li>
-<li >大学城中路-超速20%</li>
-<li >大学城中路-超速20%</li>
-<li >大学城中路-超速20%</li>
-<li >大学城中路-超速20%</li>
-<li >大学城中路-超速20%</li>
-<li >大学城中路-超速20%</li>
+<li id="IllegalInfo_1"></li>
 </ul>
 </div>
 	
@@ -162,7 +159,24 @@ $(window).load(function() {
      	<div id="map_path" style="position: absolute; left:0; top:10%; height:90%; width:100%">
      	</div>
      </div>
-     <div id="page_my" class="page out" >
+     <div id="page_my"  class="page out">
+     <div id="my_top">
+<div style=" margin-left:10px;margin-top:10px;">
+<img src="/DrivingBehavior/resources/images/avatar.png"  style="width:50px;height:50px;border-radius:50px;" />
+</div>
+<div style="position:absolute; left:100px; top:40%">
+<a style=" color:#FFFFFF">Triple</a>
+</div>
+<img src="/DrivingBehavior/resources/images/next.png"  style=" position:absolute; top:40%;right:10px" />
+</div>
+ <ul style="position:absolute; top:15%;width:100%;height:10%; ">
+ <li class="my_statistics">99.99公里<br/><span style="color:#000000; font-size:12px">总里程</span></li>
+ <li class="my_statistics">30km/h<br/><span style="color:#000000; font-size:12px">平均速度</span></li>
+ <li class="my_statistics">5次<br/><span style="color:#000000; font-size:12px">不良驾驶</span></li>
+ </ul>
+ <div id="my_exit" onClick="javascript:my_exit()">
+ <span style="position:relative;top:20%; color:#F8F8F8; font-size:25px">退出</span>
+ </div>
      </div>
      <div id="page_information_child" class="page out">
      </div>
@@ -174,7 +188,7 @@ $(window).load(function() {
                                 <a href="#page_realtime" onclick="HideDiv1()" class="icon"><img src="/DrivingBehavior/resources/images/icons/Real1.png"  alt="" title="" border="0" id="icon_Real"/><span>实时</span></a>
                                 <a href="#page_information" onclick="HideDiv2()" class="icon"><img src="/DrivingBehavior/resources/images/icons/infomation1.png"  alt="" title="" border="0" id="icon_infomation"/><span>统计</span></a>
                                 <a href="#page_path" onclick="HideDiv3()" class="icon"><img src="/DrivingBehavior/resources/images/icons/path1.png"  alt="" title="" border="0" id="icon_path"/><span>路径</span></a>
-                                <a href="#page_my" onclick="HideDiv4()" class="icon"><img src="/DrivingBehavior/resources/images/icons/my1.png"  alt="" title="" border="0" id="icon_my"/><span>我的</span></a>
+                                <a href="#page_my"  onclick="HideDiv4()" class="icon"><img src="/DrivingBehavior/resources/images/icons/my1.png"  alt="" title="" border="0" id="icon_my"/><span>我的</span></a>
                             </li>
                         </ul>
                 </div>  <!--Remove this DIV if you want to remove the pagination-->
@@ -194,6 +208,10 @@ $(window).load(function() {
 				var speed=0;
 		        var orientations=1;
 		        var cur_distance=0;
+		        var driving_time=0;
+		        var not_driving_time=0;
+		        var bad_driving_time=0;
+		        var section=new Array();//Info_page使用
 				map.centerAndZoom(point, 15);                 //初始化地图，设置中心点坐标和地图级别
 				pathmap.centerAndZoom(point, 18);
 				informationmap.centerAndZoom(point, 18);
@@ -224,10 +242,64 @@ $(window).load(function() {
 				
 	$(document).ready(function(){
 				HideDiv1();
-				
-				 setInterval("myInterval()",5000);//1000为1秒钟  
+				setInterval("counting_time()",1000);//1000为1秒钟  
+				setInterval("myInterval()",5000);//1000为1秒钟  
 	});
-
+function counting_time()
+{
+	var hour=0;
+	var min=0;
+	var sec=0;
+	var s_hour;
+	var s_min;
+	var s_sec;
+	if(speed<1)
+	{
+	driving_time++;
+	//alert(driving_time);
+	 hour=parseInt(driving_time/3600);
+	 //alert(hour);
+	 var temp=driving_time-hour*3600;
+	 min=parseInt(temp/60);
+	 temp=driving_time-3600*hour-60*min;
+	 
+	sec=temp;
+	if(hour<10)
+	{
+		s_hour="0"+hour;
+	}
+	else
+	s_hour=hour;
+	if(min<10)
+	{
+		s_min="0"+min;
+	}
+	else
+	s_min=min;
+	if(sec<10)
+	{
+		s_sec="0"+sec;
+	}
+	else
+	s_sec=sec;
+	document.getElementById( "realtime_time" ).innerHTML=s_hour+":"+s_min+":"+s_sec;
+	not_driving_time=0;
+	if(driving_time==3600*4)
+		{
+		alert("您已经连续驾驶超过4小时，请停车休息！");
+		bad_driving_time++;
+		Add_bad_driving("连续驾驶超过4小时");
+		}
+	}
+	if(speed>11)
+	{
+		not_driving_time++;
+		if(not_driving_time>1000*60*5)
+			{
+			driving_time=0;
+			}
+	}
+}
 function myInterval()
 {
 	orientations=a;
@@ -296,9 +368,9 @@ function theLocation(longitude,latitude,orienta)
 
 function SetSpeedAndDirection(speed1,direction1)
 {
-	speed=speed1;
+	speed=parseFloat(speed1);
 	//orientation=direction1;
-	document.getElementById( "speed" ).value=speed1;
+	document.getElementById( "realtime_speed" ).innerHTML=speed.toFixed(2)+"km/h";
 	//document.getElementById( "direction" ).value=direction1;
 	
 	vectorFCArrowGPS = new BMap.Marker(new BMap.Point(point.lng-0.001,point.lat), {
@@ -355,6 +427,7 @@ function test()
 }
 function HideDiv1()
 {
+	document.title ="实时信息";
 	//alert("HideDiv1");
 	document.getElementById("icon_Real").src="/DrivingBehavior/resources/images/icons/Real2.png";
 	document.getElementById("icon_infomation").src="/DrivingBehavior/resources/images/icons/infomation1.png";
@@ -366,6 +439,7 @@ function HideDiv1()
 }
 function HideDiv2()
 {
+	document.title ="统计信息";
 	//alert("HideDiv2");
 	document.getElementById("icon_Real").src="/DrivingBehavior/resources/images/icons/Real1.png";
 	document.getElementById("icon_infomation").src="/DrivingBehavior/resources/images/icons/infomation2.png";
@@ -389,6 +463,7 @@ function HideDiv3()
 }
 function HideDiv4()
 {
+	document.title ="我的信息";
 	//alert("HideDiv4");
 	document.getElementById("icon_Real").src="/DrivingBehavior/resources/images/icons/Real1.png";
 	document.getElementById("icon_infomation").src="/DrivingBehavior/resources/images/icons/infomation1.png";
@@ -469,10 +544,70 @@ function AddDrivingTime()
 	{ 
 	document.getElementById("InfoTimeInterval").removeChild(document.getElementById("InfoTimeInterval").options[i]); 
 	}
-for(var i=0;i<6;i++)
-	{
-		document.getElementById("InfoTimeInterval").options.add(new Option(i, i));
-	}
+	var date=document.getElementById("InfoChooseDate").value;
+	var starttime="0:00";
+	var endtime="23:59:59"
+	var temper1=date+" "+starttime;
+	var temper2=date+" "+endtime;
+	var dt1 = new Date(temper1.replace(/-/,"/"));
+	var dt2= new Date(temper2.replace(/-/,"/"));
+	$.ajax
+    ({
+	//type:"POST",
+	  //dataType:"json",
+	  cache:false,
+	  url:"http://3040278.nat123.net:20306/DrivingBehavior/demo/getDrivingInfoByTime.json",
+	  data:{starttime:dt1.getTime(),endtime:dt2.getTime(),username:username},
+	  //contentType:"application/json",
+	  error: function(XMLHttpRequest, textStatus, errorThrown) {
+            //alert(XMLHttpRequest.status);
+            //alert(XMLHttpRequest.readyState);
+           // alert(textStatus);
+	  },
+	  success:function(res){
+	      alert(res.length);
+	      var j=0;
+	      var timeArray=new Array();
+	      section.length=0;
+	      section[0]=0;
+	      for(var i=0;i<res.length-1;i++)
+	    	{
+	    	 		if( res[i+1].time-res[i].time>1000*300)
+	    	 			{
+	    	 			section.push(i);
+	    	 			section.push(i+1);
+	    	 		//var s = new Date();
+	    	 		//var e = new Date();
+	    	 		//s.setTime(res[i].time);
+	    	 		//e.setTime(res[i+1].time);
+	    	 		//document.getElementById("InfoTimeInterval").options.add(new Option(s.getHours()+":"+s.getMinutes()+":"+s.getSeconds()+"---"+
+	    	 			//	e.getHours()+":"+e.getMinutes()+":"+e.getSeconds(), j));
+	    	 	//	j++;
+	    	 			}
+	        		//var temp_point=new BMap.Point(res[i].longitude, res[i].latitude);
+	      			//pathpoints.push(temp_point);
+	    	}
+	      section.push(res.length-1);
+	      var a=section.length/2;
+	      for(var i=0;i<a;i++)
+	    	  {
+	    	  section[i]=res.slice(section[i*2],section[i*2+1]+1);
+	    	  //alert(section[i]);
+	    	  }
+	      for(var i=0;i<section.length;i++)
+	    	  {
+	    	var len=section[i].length;
+	    	var s = new Date();
+  	 		var e = new Date();
+  	 		s.setTime(section[i][0].time);
+  	 		e.setTime(section[i][len-1].time);
+  	 		document.getElementById("InfoTimeInterval").options.add(new Option(s.getHours()+":"+s.getMinutes()+":"+s.getSeconds()+"---"+
+  	 				e.getHours()+":"+e.getMinutes()+":"+e.getSeconds(), i));
+	    	  }
+	  }
+	 
+
+});
 }
 function ShowInfo()
 {
@@ -482,11 +617,60 @@ function ShowInfo()
 	}
 	else
 	{
-	alert(document.getElementById("InfoTimeInterval").value);
-	document.getElementById("example").innerHTML=document.getElementById("InfoChooseDate").value+" "+document.getElementById("InfoTimeInterval").value;
+		var index=document.getElementById("InfoTimeInterval").value;
+		var len=section[index].length-1;
+		var StartPoint="asdsad";
+		var EndPoint;
+	document.getElementById("example").innerHTML=document.getElementById("InfoChooseDate").value+" "+
+	document.getElementById("InfoTimeInterval").options[document.getElementById("InfoTimeInterval").value].text;
+	var geoc = new BMap.Geocoder();
+	var temp_point=new BMap.Point(section[index][0].longitude, section[index][0].latitude);
+	geoc.getLocation(temp_point, function(rs){
+			var addComp = rs.addressComponents;
+			StartPoint=addComp.street+" "+addComp.streetNumber;
+			
+			document.getElementById("Info_FromTo").innerHTML=StartPoint;
+		});   
+	temp_point=new BMap.Point(section[index][len].longitude, section[index][len].latitude);
+	geoc.getLocation(temp_point, function(rs){
+		var addComp = rs.addressComponents;
+		EndPoint="→"+addComp.street+" "+addComp.streetNumber;
+		//alert(EndPoint);
+		document.getElementById("Info_FromTo").innerHTML+=EndPoint;
+	});   
+	var temp_Array=new Array();
+	for(var i=0;i<len+1;i++)
+	{
+    		var temp_point=new BMap.Point(section[index][i].longitude, section[index][i].latitude);
+    		temp_Array[i]=temp_point;
+	}
+	 var path_distance=0;
+     for(var b=0;b<len;b++)
+ 	{
+     	path_distance+=informationmap.getDistance(temp_Array[b],temp_Array[b+1]);
+ 	}
+    
+     document.getElementById("Info_distance").innerHTML= path_distance.toFixed(2)+"米";
+     var avgspeed=0;
+     var maxspeed=0;
+     var sppedArray=new Array();
+     for(var i=0;i<len+1;i++)
+    {
+    	 avgspeed+=section[index][i].velocity;
+    	 sppedArray[i]=section[index][i].velocity;
+    }
+     avgspeed=avgspeed/len+1;
+     document.getElementById("Info_speed_avg").innerHTML="平均速度："+avgspeed.toFixed(2)+"km/h";
+     maxspeed=Math.max.apply(null, sppedArray);
+     document.getElementById("Info_speed_max").innerHTML="最高速度："+maxspeed.toFixed(2)+"km/h";
 	$("#TimeSelectBox").fadeOut("fast");
 	$("#mask").css({ display: 'none' });
 	}
+}
+function Add_bad_driving(reason)
+{
+	document.getElementById("realtime_illegal").innerHTML=bad_driving_time+"次";
+	
 }
 	$(function ($) {
 		//弹出登录

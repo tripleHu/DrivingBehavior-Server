@@ -12,7 +12,7 @@
  </style>
 </head>
 <body>
-<form action="reg.do" method="POST">
+<form action="http://3040278.nat123.net:20306/DrivingBehavior/user/reg.do" method="POST">
 <div id="a" style="position:absolute; width:100%; z-index:-1">    
 <img src="/DrivingBehavior/resources/register.png" height="100%" width="100%"/>    
 <div style="position:absolute; top:50%;left:30%;width:40%;">

@@ -250,7 +250,11 @@ html[xmlns] .slides {display: block;}
 .rg-image-nav a.rg-image-nav-next{right:1%;left:auto;background-position:140% 50%;}
 .rg-loading{width:46px;height:46px;position:absolute;top:50%;left:50%;background:#000 url("/DrivingBehavior/resources/images/ajax-loader.gif")/*tpa=http://famousthemes.com/my-mobile-page-v3/main-theme/images/ajax-loader.gif*/ no-repeat center center;margin:-23px 0px 0px -23px;z-index:9999;
 -moz-border-radius: 10px;-webkit-border-radius: 10px;border-radius: 10px;opacity:0.7;}
-
+/*my_page_css*/
+#my_top{position:absolute;top:0;left:0;height:15%; width:100%; background-color:#4490f7}
+.my_statistics{float:left; margin:5px 0 0 0%;padding:0% 0 0 0; font-size:15px; color:#4490f7; text-align:center; line-height:20px; width:33%;border:solid RGB(190,190,190);
+border-width: 0 1px 1px 0; color:#E11D20; font-family:"幼圆";background-color:RGB(255,255,255);}
+#my_exit{position:absolute;bottom:0;left:5%;height:8%; width:90%; background-color:#FC070B;border-radius:20px;text-align:center;}
 /* CSS Media Queries
 /*-----------------------------------------------------------------------------------*/
 @media screen and (max-width: 640px) {
