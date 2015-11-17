@@ -90,7 +90,7 @@ $(window).load(function() {
     </div>
     
 	<div id="score">
-<div class="rating rating-5" style="position:absolute; top:0% ;left:30%; margin: 0px 0 ;height:20%;">
+<div class="rating rating-5" id="driving_star"style="position:absolute; top:0% ;left:30%; margin: 0px 0 ;height:20%;">
       <i class="star-1">★</i>
       <i class="star-2">★</i>
       <i class="star-3">★</i>
@@ -99,7 +99,7 @@ $(window).load(function() {
     </div>
 <div style="position:absolute; top:20%; left:33%; height:80%; width:auto">
 <div style=" width:140px; height:140px; background-color:#4490f7; border-radius:50%;">
-         <span style="height:100%; line-height:100%; display:block; color:#FFF; text-align:center; font-size:130px">99</span>
+         <span id="info_score"style="height:100%; line-height:100%; display:block; color:#FFF; text-align:center; font-size:130px">99</span>
     </div>
 </div>
 </div>
@@ -113,9 +113,12 @@ $(window).load(function() {
 </ul>
 </div>
 <div id="IllegalInfo">
-<a href="#page_information_child" class="Line">不良驾驶信息</a>
+<a href="#page_information_child" class="Line" onclick="Show_BadBehaviorMap()" >不良驾驶信息</a>
 <ul style="position:absolute;left:10%;top:35%;width:auto;height:auto; font-size:20px">
 <li id="IllegalInfo_1"></li>
+<li id="IllegalInfo_2"></li>
+<li id="IllegalInfo_3"></li>
+<li id="IllegalInfo_4"></li>
 </ul>
 </div>
 	
@@ -165,14 +168,14 @@ $(window).load(function() {
 <img src="/DrivingBehavior/resources/images/avatar.png"  style="width:50px;height:50px;border-radius:50px;" />
 </div>
 <div style="position:absolute; left:100px; top:40%">
-<a style=" color:#FFFFFF">Triple</a>
+<a style=" color:#FFFFFF">${username}</a>
 </div>
 <img src="/DrivingBehavior/resources/images/next.png"  style=" position:absolute; top:40%;right:10px" />
 </div>
  <ul style="position:absolute; top:15%;width:100%;height:10%; ">
- <li class="my_statistics">99.99公里<br/><span style="color:#000000; font-size:12px">总里程</span></li>
- <li class="my_statistics">30km/h<br/><span style="color:#000000; font-size:12px">平均速度</span></li>
- <li class="my_statistics">5次<br/><span style="color:#000000; font-size:12px">不良驾驶</span></li>
+ <li class="my_statistics"><span id="my_distance">0.0公里</span><br/><span style="color:#000000; font-size:12px">总里程</span></li>
+ <li class="my_statistics"><span id="my_speed">0.0km/h</span><br/><span style="color:#000000; font-size:12px">平均速度</span></li>
+ <li class="my_statistics"><span id="my_BadDriving">0次</span><br/><span style="color:#000000; font-size:12px">不良驾驶</span></li>
  </ul>
  <div id="my_exit" onClick="javascript:my_exit()">
  <span style="position:relative;top:20%; color:#F8F8F8; font-size:25px">退出</span>
@@ -212,6 +215,7 @@ $(window).load(function() {
 		        var not_driving_time=0;
 		        var bad_driving_time=0;
 		        var section=new Array();//Info_page使用
+		        var BadBehaviorInfo;
 				map.centerAndZoom(point, 15);                 //初始化地图，设置中心点坐标和地图级别
 				pathmap.centerAndZoom(point, 18);
 				informationmap.centerAndZoom(point, 18);
@@ -247,13 +251,14 @@ $(window).load(function() {
 	});
 function counting_time()
 {
+	//alert("aaa");
 	var hour=0;
 	var min=0;
 	var sec=0;
 	var s_hour;
 	var s_min;
 	var s_sec;
-	if(speed<1)
+	if(speed>0)
 	{
 	driving_time++;
 	//alert(driving_time);
@@ -291,7 +296,7 @@ function counting_time()
 		Add_bad_driving("连续驾驶超过4小时");
 		}
 	}
-	if(speed>11)
+	if(speed<1)
 	{
 		not_driving_time++;
 		if(not_driving_time>1000*60*5)
@@ -302,7 +307,7 @@ function counting_time()
 }
 function myInterval()
 {
-	orientations=a;
+	//orientations=a;
 	//alert(a);
 	//alert(orientations);
 	if(speed>0)
@@ -315,7 +320,7 @@ function myInterval()
 			            	  //dataType:"json",
 			            	  cache:false,
 			            	  url:"recordLocation.json",
-			            	  data:{longitude:point.lng,latitude:point.lat,velocity: speed,orientation: a,username:username},
+			            	  data:{longitude:point.lng,latitude:point.lat,velocity: speed,orientation:orientations,username:username},
 			            	  //contentType:"application/json",
 			            	  error: function(XMLHttpRequest, textStatus, errorThrown) {
 			                        //alert(XMLHttpRequest.status);
@@ -337,10 +342,10 @@ function theLocation(longitude,latitude,orienta)
 {
 	orientations=orienta;
 	//alert(orientation);
-	a=orienta;
+	//a=orienta;
 					if(longitude!= "" &&latitude != "")
 					{
-						BMap.getDistance
+						//BMap.getDistance
 						//map.removeOverlay(vectorFCArrowGPS); 
 						//map.removeOverlay(vectorFCArrow); 
 						map.clearOverlays();
@@ -351,7 +356,7 @@ function theLocation(longitude,latitude,orienta)
 							  icon: new BMap.Symbol(BMap_Symbol_SHAPE_FORWARD_CLOSED_ARROW, {
 							    scale: 2,
 							    strokeWeight: 1,
-							    rotation: orienta,//顺时针旋转
+							    rotation: orientations,//顺时针旋转
 							    fillColor: 'red',
 							    fillOpacity: 0.8
 							  })
@@ -373,16 +378,7 @@ function SetSpeedAndDirection(speed1,direction1)
 	document.getElementById( "realtime_speed" ).innerHTML=speed.toFixed(2)+"km/h";
 	//document.getElementById( "direction" ).value=direction1;
 	
-	vectorFCArrowGPS = new BMap.Marker(new BMap.Point(point.lng-0.001,point.lat), {
-		  // 初始化方向向上的闭合箭头
-		  icon: new BMap.Symbol(BMap_Symbol_SHAPE_FORWARD_CLOSED_ARROW, {
-		    scale: 2,
-		    strokeWeight: 1,
-		    rotation:direction1,//顺时针旋转
-		    fillColor: 'red',
-		    fillOpacity: 0.8
-		  })
-		});
+	
 	//alert(speed1+","+direction1);
 }
 function RecordPonints(point)
@@ -397,15 +393,11 @@ function RecordPonints(point)
 		var index=points.length-1;
 		if(points[index].equals(point))
 			{
-			
+			return;
 			}
 		else
 			{
-			if(speed>0)
-				{
-					cur_distance=map.getDistance(points[index],point)+cur_distance;
-				}
-			document.getElementById( "direction" ).value=cur_distance.toFixed(2)+"米";
+			
 			points.push(point);
 			//var pointss=[points[index],point];
 			//alert(points[index]);
@@ -416,15 +408,7 @@ function RecordPonints(point)
 		
 	}
 }
-function test()
-{
-	
-	for(i=0;i<500;i++)
-		{
-			theLocation(106.300322+i*0.0001,29.604529,0);
-		}
-	//alert(map.getOverlays().length);
-}
+
 function HideDiv1()
 {
 	document.title ="实时信息";
@@ -472,6 +456,7 @@ function HideDiv4()
 	//document.getElementById("main_panels").style.display ="none";
 	//document.getElementById("top_panel").style.display ="none";
 	//document.getElementById("path_panels").style.display ="none";
+	getMyInfo();
 }
 function getUrlParam(name)
 {
@@ -530,11 +515,7 @@ function getPath(start,end)
 	  }
 	 
 });
-	//alert(pathpoints.length);
-	if(pathpoints.length>0)
-		{
-	 
-		}
+
 }
 </script >
 <script type="text/javascript">
@@ -546,7 +527,7 @@ function AddDrivingTime()
 	}
 	var date=document.getElementById("InfoChooseDate").value;
 	var starttime="0:00";
-	var endtime="23:59:59"
+	var endtime="23:59:59";
 	var temper1=date+" "+starttime;
 	var temper2=date+" "+endtime;
 	var dt1 = new Date(temper1.replace(/-/,"/"));
@@ -565,9 +546,12 @@ function AddDrivingTime()
            // alert(textStatus);
 	  },
 	  success:function(res){
-	      alert(res.length);
-	      var j=0;
-	      var timeArray=new Array();
+		  if(res.length==0)
+	      alert("无相关数据");
+		  else
+			  alert("查询到"+res.length+"条数据");
+	     
+	      
 	      section.length=0;
 	      section[0]=0;
 	      for(var i=0;i<res.length-1;i++)
@@ -663,14 +647,209 @@ function ShowInfo()
      document.getElementById("Info_speed_avg").innerHTML="平均速度："+avgspeed.toFixed(2)+"km/h";
      maxspeed=Math.max.apply(null, sppedArray);
      document.getElementById("Info_speed_max").innerHTML="最高速度："+maxspeed.toFixed(2)+"km/h";
+     
+     $.ajax
+	    ({
+ 	  //type:"POST",
+ 	  //dataType:"json",
+ 	  cache:false,
+ 	  url:"getBadBehaviorByTime.json",
+ 	  data:{starttime:section[index][0].time,endtime:section[index][len].time,username:username},
+ 	  //contentType:"application/json",
+ 	  error: function(XMLHttpRequest, textStatus, errorThrown) {
+             //alert(XMLHttpRequest.status);
+            // alert(XMLHttpRequest.readyState);
+           // alert(textStatus);
+ 		 
+ 	  },
+ 	  success:function(res){
+ 		  BadBehaviorInfo=res;
+ 		  if(res.length==0)
+ 		 {
+ 		 document.getElementById("driving_star").className="rating rating-5";
+ 		 document.getElementById("info_score").innerHTML="99";
+ 		document.getElementById("IllegalInfo_1").innerHTML ="恭喜！没有不良驾驶信息。";
+ 		 }
+ 		 if(res.length==1)
+ 		 {
+ 		 document.getElementById("driving_star").className="rating rating-4";
+ 		 document.getElementById("info_score").innerHTML="85";
+ 		 }
+ 		if(res.length==2)
+		 {
+		 document.getElementById("driving_star").className="rating rating-3";
+		 document.getElementById("info_score").innerHTML="60";
+		 }
+ 		if(res.length==3)
+		 {
+		 document.getElementById("driving_star").className="rating rating-2";
+		 document.getElementById("info_score").innerHTML="60";
+		 }
+ 		if(res.length>3)
+		 {
+		 document.getElementById("driving_star").className="rating rating-1";
+		 document.getElementById("info_score").innerHTML="40";
+		 }
+ 		if(res.length<=4)
+ 		{
+ 			for(var i=0;i<res.length;i++)
+ 			{
+ 			var reason=res[i].reason;
+ 			var j=i+1;
+ 			temp_point=new BMap.Point(res[i].longitude, res[i].latitude);
+ 			geoc.getLocation(temp_point, function(rs){
+ 			var addComp = rs.addressComponents;
+ 			var address=addComp.street+" "+addComp.streetNumber;
+ 			//alert(address);
+ 			document.getElementById("IllegalInfo_"+j).innerHTML =address+"——"+reason;
+ 		}); 
+ 			}
+ 		}
+ 		if(res.length>4)
+ 		{
+ 			for(var i=0;i<3;i++)
+ 			{
+ 				var reason=res[i].reason;
+ 	 			var j=i+1;
+ 			temp_point=new BMap.Point(res[i].longitude, res[i].latitude);
+ 			geoc.getLocation(temp_point, function(rs){
+ 			var addComp = rs.addressComponents;
+ 			var address=addComp.street+" "+addComp.streetNumber;
+ 			//alert(EndPoint);
+ 			document.getElementById("IllegalInfo_"+j).innerHTML =address+"——"+reason;
+ 		}); 
+ 			}
+ 			document.getElementById("IllegalInfo_4").innerHTML ="... ...";
+ 		}
+ 		
+ 	  }
+ });
 	$("#TimeSelectBox").fadeOut("fast");
 	$("#mask").css({ display: 'none' });
 	}
 }
+function AddMarkerOnMap(res)
+{
+	
+	var data_info=new Array();
+	informationmap.clearOverlays();
+	for(var i=0;i<res.length;i++)
+		{
+		    var s= new Date();
+	 		s.setTime(res[i].time);
+	 		var ctime=s.getHours()+":"+s.getMinutes()+":"+s.getSeconds();
+			data_info[i]=[res[i].longitude,res[i].latitude,ctime+"<br/>"+res[i].reason+"<br/>"+"速度："+res[i].velocity+"km/h"];
+		}
+	
+   for(var i=0;i<data_info.length;i++){
+	var marker = new BMap.Marker(new BMap.Point(data_info[i][0],data_info[i][1]));  // 创建标注
+	 var tpoint=new BMap.Point(data_info[i][0],data_info[i][1]);
+	   informationmap.centerAndZoom(tpoint,15);
+	  // informationmap.panTo(tpoint);
+	var content = data_info[i][2];
+	informationmap.addOverlay(marker);               // 将标注添加到地图中
+	addClickHandler(content,marker);
+}
+   informationmap.panBy(160,200);
+}
+
+function addClickHandler(content,marker){
+	marker.addEventListener("click",function(e){
+		openInfo(content,e)}
+	);
+}
+function openInfo(content,e){
+	var opts = {
+			width : 250,     // 信息窗口宽度
+			height: 80,     // 信息窗口高度
+			title : "不良驾驶信息" , // 信息窗口标题
+			enableMessage:true//设置允许信息窗发送短息
+		   };
+	var p = e.target;
+	var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+	var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+	informationmap.openInfoWindow(infoWindow,point); //开启信息窗口
+}
 function Add_bad_driving(reason)
 {
 	document.getElementById("realtime_illegal").innerHTML=bad_driving_time+"次";
+	$.ajax
+    ({
+	type:"POST",
+	  //dataType:"json",
+	  cache:false,
+	  url:"savebadbehaviorinfo.json",
+	  data:{longitude:point.lng,latitude:point.lat,velocity: speed,reason:reason,username:username},
+	  //contentType:"application/json",
+	  error: function(XMLHttpRequest, textStatus, errorThrown) {
+            //alert(XMLHttpRequest.status);
+            //alert(XMLHttpRequest.readyState);
+           // alert(textStatus);
+	  },
+	  success:function(res){
+	      //alert(res)
+	  }
+});
 	
+}
+function getMyInfo()
+{
+	$.ajax
+    ({
+	 //type:"POST",
+	  //dataType:"json",
+	  cache:false,
+	  url:"getMyInfo.json",
+	  data:{name:username},
+	  //contentType:"application/json",
+	  error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert(XMLHttpRequest.status);
+            alert(XMLHttpRequest.readyState);
+            alert(textStatus);
+	  },
+	  success:function(res){
+	      //alert(res)
+	      var dis=parseFloat(res.distance)/1000;
+	      document.getElementById("my_distance").innerHTML =dis.toFixed(2)+"公里";
+	      var spe=parseFloat(res.avgspeed);
+	      document.getElementById("my_speed").innerHTML =spe.toFixed(2)+"km/h";
+	      
+	  }
+    });
+	$.ajax
+    ({
+	 //type:"POST",
+	  //dataType:"json",
+	  cache:false,
+	  url:"getAllBadBehaviorTimes.json",
+	  data:{username:username},
+	  //contentType:"application/json",
+	  error: function(XMLHttpRequest, textStatus, errorThrown) {
+            //alert(XMLHttpRequest.status);
+            //alert(XMLHttpRequest.readyState);
+           // alert(textStatus);
+	  },
+	  success:function(res){
+	      document.getElementById("my_BadDriving").innerHTML =res+"次";
+	  }
+    });
+}
+
+function Show_BadBehaviorMap()
+{
+	
+	//informationmap.addEventListener("tilesloaded",function(){  
+		if(BadBehaviorInfo.length>0)
+		{
+		AddMarkerOnMap(BadBehaviorInfo);
+		}
+		
+	   // });  
+	
+}
+function my_exit()
+{
+	window.location.href="http://3040278.nat123.net:20306/DrivingBehavior/";
 }
 	$(function ($) {
 		//弹出登录
