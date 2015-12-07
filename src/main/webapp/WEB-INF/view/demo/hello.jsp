@@ -14,6 +14,8 @@
 <script src="/DrivingBehavior/resources/js/jquery-1.8.3.min.js" ></script>
 <!-- FlexSlider -->
 <script src="/DrivingBehavior/resources/js/jquery.flexslider.js" ></script>
+<!-- jQuery Tabs -->
+<script src="/DrivingBehavior/resources/js/jquery.tabify.js" tppabs="http://famousthemes.com/my-mobile-page-v3/main-theme/js/jquery.tabify.js" type="text/javascript" charset="utf-8"></script>
 <!-- MobileBone CSS file-->
 <link rel="stylesheet" href="/DrivingBehavior/resources/css/mobilebone.css">
 <!-- MobileBone JS file-->
@@ -43,6 +45,14 @@ $(window).load(function() {
 	slideshow: false
 	});
 });
+$(function() {
+	$('#tabsmenu').tabify();
+	$(".toggle_container").hide(); 
+	$(".trigger").click(function(){
+		$(this).toggleClass("active").next().slideToggle("slow");
+		return false;
+	});
+	});
 </script>
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=QQO985xOjQfV6NLcDtuMSPVN">
 //v1.5版本的引用方式：src="http://api.map.baidu.com/api?v=1.5&ak=您的密钥"
@@ -67,7 +77,7 @@ $(window).load(function() {
      <div id="page_information" class="page out" >
      <a href="#" id="example">请选择查询时间</a>
 	
-    <div id="TimeSelectBox">
+    <div class="TimeSelectBox">
         <div class="row1">
             请选择驾驶区间<a href="javascript:void(0)" title="关闭窗口" class="close_btn" id="closeBtn">×</a>
         </div>
@@ -177,6 +187,19 @@ $(window).load(function() {
  <li class="my_statistics"><span id="my_speed">0.0km/h</span><br/><span style="color:#000000; font-size:12px">平均速度</span></li>
  <li class="my_statistics"><span id="my_BadDriving">0次</span><br/><span style="color:#000000; font-size:12px">不良驾驶</span></li>
  </ul>
+ <div class="toogle_wrap">
+ <div class="trigger"><a href="#">修改密码</a></div>
+
+            <div class="toggle_container">
+                <ul class="changepassword">
+                <li><input type="password" placeholder="旧密码" style="border:none; width:100%; text-align:center" id="my_oldcode"></li>
+                <li><input type="password" placeholder="新密码" style="border:none; width:100%; text-align:center" id="my_newcode"></li>
+                <li><input type="password" placeholder="确认新密码" style="border:none; width:100%; text-align:center" id="my_comfirmnewcode"></li>
+                <li style="color:#F40A0E; text-align:center; font-size:12px" id="my_code_info">密码长度必须大于6个字符</li>
+                <li style="border:none;"><input type="button" value="确定"  onClick="my_ChangePassWord()" style="position:relative; left:20%; width:60%; height:30px; background:#4490f7;color:RGB(255,255,255); border:none "></li>
+                </ul>
+            </div>
+ </div>
  <div id="my_exit" onClick="javascript:my_exit()">
  <span style="position:relative;top:20%; color:#F8F8F8; font-size:25px">退出</span>
  </div>
@@ -210,6 +233,7 @@ $(window).load(function() {
 				var username=getUrlParam("username");
 				var speed=0;
 		        var orientations=1;
+		        var acceleration=0;
 		        var cur_distance=0;
 		        var driving_time=0;
 		        var not_driving_time=0;
@@ -320,7 +344,7 @@ function myInterval()
 			            	  //dataType:"json",
 			            	  cache:false,
 			            	  url:"recordLocation.json",
-			            	  data:{longitude:point.lng,latitude:point.lat,velocity: speed,orientation:orientations,username:username},
+			            	  data:{longitude:point.lng,latitude:point.lat,velocity: speed,orientation:orientations,acceleration:acceleration,username:username},
 			            	  //contentType:"application/json",
 			            	  error: function(XMLHttpRequest, textStatus, errorThrown) {
 			                        //alert(XMLHttpRequest.status);
@@ -371,11 +395,13 @@ function theLocation(longitude,latitude,orienta)
 					
 }
 
-function SetSpeedAndDirection(speed1,direction1)
+function SetSpeedAndDirection(speed1,direction1,acceleration1)
 {
+	
+	acceleration=parseFloat(acceleration1);
 	speed=parseFloat(speed1);
 	//orientation=direction1;
-	document.getElementById( "realtime_speed" ).innerHTML=speed.toFixed(2)+"km/h";
+	document.getElementById( "realtime_speed" ).innerHTML=speed.toFixed(0)+"km/h";
 	//document.getElementById( "direction" ).value=direction1;
 	
 	
@@ -537,13 +563,13 @@ function AddDrivingTime()
 	//type:"POST",
 	  //dataType:"json",
 	  cache:false,
-	  url:"http://3040278.nat123.net:20306/DrivingBehavior/demo/getDrivingInfoByTime.json",
+	  url:"getDrivingInfoByTime.json",
 	  data:{starttime:dt1.getTime(),endtime:dt2.getTime(),username:username},
 	  //contentType:"application/json",
 	  error: function(XMLHttpRequest, textStatus, errorThrown) {
             //alert(XMLHttpRequest.status);
             //alert(XMLHttpRequest.readyState);
-           // alert(textStatus);
+            //alert(textStatus);
 	  },
 	  success:function(res){
 		  if(res.length==0)
@@ -724,7 +750,7 @@ function ShowInfo()
  		
  	  }
  });
-	$("#TimeSelectBox").fadeOut("fast");
+	$(".TimeSelectBox").fadeOut("fast");
 	$("#mask").css({ display: 'none' });
 	}
 }
@@ -803,17 +829,19 @@ function getMyInfo()
 	  data:{name:username},
 	  //contentType:"application/json",
 	  error: function(XMLHttpRequest, textStatus, errorThrown) {
-            alert(XMLHttpRequest.status);
-            alert(XMLHttpRequest.readyState);
-            alert(textStatus);
+            //alert(XMLHttpRequest.status);
+            //alert(XMLHttpRequest.readyState);
+            //alert(textStatus);
 	  },
 	  success:function(res){
 	      //alert(res)
+	      if(res!="")
+	       {
 	      var dis=parseFloat(res.distance)/1000;
 	      document.getElementById("my_distance").innerHTML =dis.toFixed(2)+"公里";
 	      var spe=parseFloat(res.avgspeed);
 	      document.getElementById("my_speed").innerHTML =spe.toFixed(2)+"km/h";
-	      
+	       }
 	  }
     });
 	$.ajax
@@ -847,10 +875,64 @@ function Show_BadBehaviorMap()
 	   // });  
 	
 }
+function my_ChangePassWord()
+{
+	var vaild=true;;
+	var oldcode=document.getElementById("my_oldcode").value;
+	var newcode=document.getElementById("my_newcode").value;
+	var comfirmnewcode=document.getElementById("my_comfirmnewcode").value;
+	var code_info=document.getElementById("my_code_info").innerHTML;
+	if(oldcode==""||newcode==""||comfirmnewcode==""||oldcode==null||newcode==null||comfirmnewcode==null)
+	{
+		document.getElementById("my_code_info").innerHTML="密码不能为空";
+		vaild=false;
+	}
+	else 
+	{
+		if(newcode!=comfirmnewcode)
+		{
+		document.getElementById("my_code_info").innerHTML="两次输入的新密码不同";
+		vaild=false;
+		}
+		else if(newcode.length<6)
+		{
+			document.getElementById("my_code_info").innerHTML="密码长度必须大于6个字符，请重新输入";
+			vaild=false;
+		}
+	}
+	if(vaild)
+	{
+		$.ajax
+	    ({
+		 //type:"POST",
+		  //dataType:"json",
+		  cache:false,
+		  url:"changepassword.json",
+		  data:{oldcode:oldcode,newcode:newcode,name:username},
+		  //contentType:"application/json",
+		  error: function(XMLHttpRequest, textStatus, errorThrown) {
+	            alert(XMLHttpRequest.status);
+	            alert(XMLHttpRequest.readyState);
+	            alert(textStatus);
+		  },
+		  success:function(res){
+		      //alert(res)
+		      document.getElementById("my_code_info").innerHTML=res.result; 
+		      if(res.result=="修改成功")
+		    	  {
+		    	    document.getElementById("my_oldcode").value="";
+		    		document.getElementById("my_newcode").value="";
+		    		document.getElementById("my_comfirmnewcode").value="";
+		    	  }
+		  }
+	    });
+	}
+}
 function my_exit()
 {
-	window.location.href="http://3040278.nat123.net:20306/DrivingBehavior/";
+	window.location.href="http://115.28.243.122:20306/DrivingBehavior/";
 }
+
 	$(function ($) {
 		//弹出登录
 		$("#example").hover(function () {
@@ -864,7 +946,7 @@ function my_exit()
 		}).on('click', function () {
 			$("body").append("<div id='mask'></div>");
 			$("#mask").addClass("mask").fadeIn("slow");
-			$("#TimeSelectBox").fadeIn("slow");
+			$(".TimeSelectBox").fadeIn("slow");
 		});
 		//
 		//按钮的透明度
@@ -880,7 +962,7 @@ function my_exit()
 		
 		//关闭
 		$(".close_btn").hover(function () { $(this).css({ color: 'black' }) }, function () { $(this).css({ color: '#999' }) }).on('click', function () {
-			$("#TimeSelectBox").fadeOut("fast");
+			$(".TimeSelectBox").fadeOut("fast");
 			$("#mask").css({ display: 'none' });
 		});
 	});

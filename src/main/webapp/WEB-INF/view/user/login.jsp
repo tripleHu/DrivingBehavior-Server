@@ -11,9 +11,9 @@
  </style>
 </head>
 <body>
-<form action="http://3040278.nat123.net:20306/DrivingBehavior/user/login.do" method="POST">
-<div id="a" style="position:absolute; width:100%;  z-index:-1">    
-<img src="/DrivingBehavior/resources/login.png" height="100%" width="100%"/>    
+<form action="login.do" method="POST">
+<div id="a" style="position:absolute; width:100%;  heigth:auto;z-index:-1">    
+<img src="/DrivingBehavior/resources/login.png" style="height:100% ;width:100%"/>    
 <div style="position:absolute; top:50%;left:30%;width:40%;">
 <input type="text" name="username" placeholder="用户名" value="${username }" style="width: 100%; height: 100%; font-size: 24px;">${nameError}
 </div>

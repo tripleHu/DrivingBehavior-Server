@@ -32,7 +32,10 @@ public class DrivingInfo
 	//速度
 		@Column(length=20,nullable=false,unique=false)
 		private float velocity;
-	//方向
+   //加速度
+		@Column(length=20,nullable=false,unique=false)
+		private float acceleration;
+		//方向
 		@Column(length=20,nullable=false,unique=false)
 		private float orientation;
 	//设置外键依赖
@@ -80,5 +83,11 @@ public class DrivingInfo
 		}
 		public void setLatitude(double latitude) {
 			this.latitude = latitude;
+		}
+		public float getAcceleration() {
+			return acceleration;
+		}
+		public void setAcceleration(float acceleration) {
+			this.acceleration = acceleration;
 		}
 }

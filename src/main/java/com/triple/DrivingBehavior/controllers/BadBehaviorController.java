@@ -46,6 +46,13 @@ public List<BadBehavior> getBadBehaviorByTime(long starttime,long endtime,String
 @ResponseBody 
 public int getAllBadBehaviorTimes(String username)
 {
+	if(badbehaviorCRUD.getByUserName(username)!=null)
+	{
 	return badbehaviorCRUD.getByUserName(username).size();
+	}
+	else
+	{
+		return 0;
+	}
 }
 }

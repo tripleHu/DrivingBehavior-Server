@@ -25,7 +25,7 @@ public class DrivingInfoController
 private DrivingInfoCRUD drivingInfoCRUD;
 @RequestMapping(value="/demo/recordLocation.json",method={RequestMethod.POST})
 @ResponseBody 
-public String recordLocation( double longitude,double latitude,float velocity,float orientation,String username)
+public String recordLocation( double longitude,double latitude,float velocity,float orientation,float acceleration,String username)
 {
 	System.out.println(orientation);
 	System.out.println(velocity);
@@ -34,6 +34,7 @@ public String recordLocation( double longitude,double latitude,float velocity,fl
 	info.setLongitude(longitude);
 	info.setVelocity(velocity);
 	info.setOrientation(orientation);
+	info.setAcceleration(acceleration);
 	info.setTime(new Date());
 	info.setUser(drivingInfoCRUD.getUser(username));
 	drivingInfoCRUD.add(info);
@@ -61,6 +62,10 @@ public Map<String,Double> getDistanceAndAvgSpeed(String name)
 	Map<String,Double> map=new HashMap<String,Double>();
 	double distance=0;
 	double speed=0;
+	if(infos==null)
+	{
+		return null;
+	}
 	if(infos.size()>0)
 	{
 	for(int i=0;i<infos.size()-1;i++)

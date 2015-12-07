@@ -22,6 +22,10 @@
 <script type="text/javascript">
 window.onload=change;
 window.onresize = change;
+//winHeight = document.documentElement.clientHeight;
+//winWidth = document.documentElement.clientWidth;
+//alert("Height "+winHeight);
+//alert("Width "+winWidth);
 function change(){
 	
 	 var a=document.body.clientWidth/480;
