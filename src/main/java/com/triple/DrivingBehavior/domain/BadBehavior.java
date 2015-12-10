@@ -28,6 +28,9 @@ public class BadBehavior {
 		//速度
 			@Column(length=20,nullable=false,unique=false)
 			private float velocity;
+		//加速度
+			@Column(length=20,nullable=false,unique=false)
+			private float acceleration;
 		//原因
 			@Column(length=100,nullable=false,unique=false)
 			private String Reason;
@@ -77,4 +80,11 @@ public class BadBehavior {
 			public void setUser(User user) {
 				this.user = user;
 			}
+			public float getAcceleration() {
+				return acceleration;
+			}
+			public void setAcceleration(float acceleration) {
+				this.acceleration = acceleration;
+			}
+			
 }

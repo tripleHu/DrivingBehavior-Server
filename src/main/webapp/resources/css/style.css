@@ -246,7 +246,7 @@ html[xmlns] .slides {display: block;}
 .my_statistics{float:left; margin:5px 0 0 0%;padding:0% 0 0 0; font-size:15px; color:#4490f7; text-align:center; line-height:20px; width:33%;border:solid RGB(190,190,190);
 border-width: 0 1px 1px 0; color:#E11D20; font-family:"幼圆";background-color:RGB(255,255,255);}
 #my_exit{position:absolute;bottom:0;left:5%;height:8%; width:90%; background-color:#FC070B;border-radius:20px;text-align:center;}
-.toogle_wrap{background-color:#FFFFFF; position:absolute; top:25%;width:100%;border:1px #ddd solid;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px; width:92%; padding:3% 4%; margin:5px 0 15px 0;}
+.toogle_wrap{background-color:#FFFFFF; position:absolute; top:28%;width:100%;border:1px #ddd solid;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px; width:92%; padding:3% 4%; margin:5px 0 15px 0;}
 .trigger{padding:0px;margin:0;background:url("/DrivingBehavior/resources/images/toggle.gif")/*tpa=http://famousthemes.com/my-mobile-page-v3/main-theme/images/toggle.gif*/ no-repeat right; background-position:100% -22px;}
 .trigger a{color: #636363;text-decoration: none;display: block; padding:2px 0 2px 0;font-size:18px;font-family:Open Sans;font-weight:normal; }
 .trigger a:hover, .trigger a:hover:focus{color:#000000;}

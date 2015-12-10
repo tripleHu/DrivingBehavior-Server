@@ -165,7 +165,7 @@ $(function() {
 						var temper2=date+" "+endtime;
 						var dt2 = new Date(temper2.replace(/-/,"/"));
 						//alert(dt1+"--"+dt2);
-						getPath(dt1.getTime(),dt2.getTime());
+						getPath(dt1.getTime(),dt2.getTime(),pathmap);
 					}
 		</script>
      	</div>
@@ -187,6 +187,12 @@ $(function() {
  <li class="my_statistics"><span id="my_speed">0.0km/h</span><br/><span style="color:#000000; font-size:12px">平均速度</span></li>
  <li class="my_statistics"><span id="my_BadDriving">0次</span><br/><span style="color:#000000; font-size:12px">不良驾驶</span></li>
  </ul>
+ <div style="position:absolute; top:23%;width:100%;height:5%;">
+ <select name="No"  style="width:100%; font-size:18px" id="bus_route" onchange="AddBusRouteOnMap()">
+	<option>805路</option>	
+    <option>806路</option>			
+ </select>
+ </div>
  <div class="toogle_wrap">
  <div class="trigger"><a href="#">修改密码</a></div>
 
@@ -224,12 +230,13 @@ $(function() {
 </div>
 </body>
 <script type="text/javascript"> 
+                /*全局变量声明放在最前*/
 				var points=new Array();//创建数组记录坐标点
 				
 				var map = new BMap.Map("map1");          // 创建地图实例  
 				var pathmap = new BMap.Map("map_path");          // 创建地图实例  
 				var informationmap = new BMap.Map("page_information_child");          // 创建地图实例  
-				var point = new BMap.Point(116.404, 39.915);  // 创建点坐标  
+				var point = new BMap.Point(106.47001350344,  29.573751219596);  // 创建点坐标  
 				var username=getUrlParam("username");
 				var speed=0;
 		        var orientations=1;
@@ -240,6 +247,9 @@ $(function() {
 		        var bad_driving_time=0;
 		        var section=new Array();//Info_page使用
 		        var BadBehaviorInfo;
+		        var CriticalSectionInfo=new Array();//关键区域信息
+		        var Bus_Route;
+		        var BMobile;//判断是否是移动端访问
 				map.centerAndZoom(point, 15);                 //初始化地图，设置中心点坐标和地图级别
 				pathmap.centerAndZoom(point, 18);
 				informationmap.centerAndZoom(point, 18);
@@ -269,10 +279,42 @@ $(function() {
 				var myIconEnd  = new BMap.Icon("/DrivingBehavior/resources/images/icons/end.png", new BMap.Size(37,62));
 				
 	$(document).ready(function(){
+				BMobileVisit();
 				HideDiv1();
+				getCriticalSectionInfo();
 				setInterval("counting_time()",1000);//1000为1秒钟  
+				if(BMobile)
+				{
+				setInterval("whether_in_CriticalSection()",1000);//1000为1秒钟  
+				}
 				setInterval("myInterval()",5000);//1000为1秒钟  
 	});
+function BMobileVisit()
+	{
+		var browser = {
+		        versions: function() {
+		            var u = navigator.userAgent,
+		            app = navigator.appVersion;
+		            return {
+		                mobile: !!u.match(/AppleWebKit.*Mobile.*/),
+		                ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
+		                android: u.indexOf("Android") > -1 || u.indexOf("Linux") > -1,
+		                iPhone: u.indexOf("iPhone") > -1,
+		                iPad: u.indexOf("iPad") > -1
+		            };
+		        } (),
+		        language: (navigator.browserLanguage || navigator.language).toLowerCase()
+		    };
+		if(browser.versions.mobile)
+			BMobile=true;
+		else
+			BMobile=false;
+		   // $("#aa2").append("userAgent 内容: <BR/>" + navigator.userAgent + "<BR/><BR/>");
+		    //$("#aa2").append("是否为移动终端: " + browser.versions.mobile + "<BR/>");
+		   // $("#aa2").append("是否 ios: " + browser.versions.ios + "<BR/>");
+		   // $("#aa2").append("是否 android: " + browser.versions.android + "<BR/>");
+
+	}
 function counting_time()
 {
 	//alert("aaa");
@@ -316,7 +358,7 @@ function counting_time()
 	if(driving_time==3600*4)
 		{
 		alert("您已经连续驾驶超过4小时，请停车休息！");
-		bad_driving_time++;
+		
 		Add_bad_driving("连续驾驶超过4小时");
 		}
 	}
@@ -360,8 +402,49 @@ function myInterval()
 		}
 					//alert("sddd");
 }
-
-
+function whether_in_CriticalSection()
+{
+	if(speed>0)
+		{
+		for(var i=0;i<CriticalSectionInfo.length;i++)
+		{
+		if(GetDistance( point.lng,  point.lat,  CriticalSectionInfo[i].longitude,  CriticalSectionInfo[i].latitude)<50)//进入关键区域半径50米内
+			{
+			var now = new Date();
+			now.setHours(18, 0, 0, 0);
+			var rushhour_morning_start=new Date();
+			rushhour_morning_start.setHours(7, 30, 0, 0);
+			var rushhour_morning_end=new Date();
+			rushhour_morning_end.setHours(8, 30, 0, 0);
+			var rushhour_evening_start=new Date();
+			rushhour_evening_start.setHours(17, 00, 0, 0);
+			var rushhour_evening_end=new Date();
+			rushhour_evening_end.setHours(19, 0, 0, 0);
+			if((rushhour_morning_start<now&&now<rushhour_morning_end)||(rushhour_evening_start<now&&now<rushhour_evening_end)&&CriticalSectionInfo[i].rushhour==true)
+			{
+				
+				CheckSpeedAndAcceleration(CriticalSectionInfo[i]);
+			}
+			if((rushhour_morning_start>now||now>rushhour_morning_end)&&(rushhour_evening_start>now||now>rushhour_evening_end)&&CriticalSectionInfo[i].rushhour==false)
+			{
+				
+				CheckSpeedAndAcceleration(CriticalSectionInfo[i]);
+			}
+			}
+		}
+		}
+}
+function CheckSpeedAndAcceleration(Info)
+{
+	if(speed>Info.maxspeed)
+		Add_bad_driving("大于良好驾驶最大速度");
+	if(speed<Info.minspeed)
+		Add_bad_driving("小于良好驾驶最小速度");
+	if(acceleration>Info.max_acceleration)
+		Add_bad_driving("大于良好驾驶最大加速度");
+	if(acceleration<Info.min_acceleration)
+		Add_bad_driving("小于良好驾驶最小加速度");
+}
 function theLocation(longitude,latitude,orienta)
 {
 	orientations=orienta;
@@ -385,7 +468,7 @@ function theLocation(longitude,latitude,orienta)
 							    fillOpacity: 0.8
 							  })
 							});
-						RecordPonints(point);                                  //记录并绘制路径
+						//RecordPonints(point);                                  //记录并绘制路径
 						
 						map.addOverlay(vectorFCArrow);              //将标注添加到地图中
 						//map.addOverlay(vectorFCArrowGPS);              //将标注添加到地图中
@@ -439,6 +522,7 @@ function HideDiv1()
 {
 	document.title ="实时信息";
 	//alert("HideDiv1");
+	map.centerAndZoom(point, 15); 
 	document.getElementById("icon_Real").src="/DrivingBehavior/resources/images/icons/Real2.png";
 	document.getElementById("icon_infomation").src="/DrivingBehavior/resources/images/icons/infomation1.png";
 	document.getElementById("icon_path").src="/DrivingBehavior/resources/images/icons/path1.png";
@@ -490,7 +574,7 @@ var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标
 var r = window.location.search.substr(1).match(reg);  //匹配目标参数
 if (r!=null) return unescape(r[2]); return null; //返回参数值
 } 
-function getPath(start,end)
+function getPath(start,end,MapForShow)
 {
 	//starttime=Date.UTC(2015,11-1,6,20,0,0)-8*3600*1000; 
 	//endtime=Date.UTC(2015,11-1,6,20,30,0)-8*3600*1000; 
@@ -507,9 +591,9 @@ function getPath(start,end)
 	  //contentType:"application/json",
 	  error: function(XMLHttpRequest, textStatus, errorThrown) {
 		  alert("查询失败");
-            alert(XMLHttpRequest.status);
-            alert(XMLHttpRequest.readyState);
-           alert(textStatus);
+            //alert(XMLHttpRequest.status);
+           // alert(XMLHttpRequest.readyState);
+         //  alert(textStatus);
 	  },
 	  success:function(res){
 	      if(res.length<=1)
@@ -526,18 +610,18 @@ function getPath(start,end)
 	        var path_distance=0;
 	        for(var b=0;b<pathpoints.length-1;b++)
 	    	{
-	        	path_distance+=pathmap.getDistance(pathpoints[b],pathpoints[b+1]);
+	        	path_distance+=MapForShow.getDistance(pathpoints[b],pathpoints[b+1]);
 	    	}
-	        alert("查询成功,距离为："+path_distance.toFixed(2)+"米");
+	       // alert("查询成功,距离为："+path_distance.toFixed(2)+"米");
 	        var line=new BMap.Polyline(pathpoints, {strokeColor:"blue", strokeWeight:3, strokeOpacity:0.5}); 
 	        var Startmarker = new BMap.Marker(pathpoints[0],{icon:myIconStart}); //创建标注
 	        var Endmarker = new BMap.Marker(pathpoints[pathpoints.length-1],{icon:myIconEnd});
-	          pathmap.clearOverlays();
-	          pathmap.addOverlay(Startmarker);
-	          pathmap.addOverlay(Endmarker);
-    		  pathmap.addOverlay(line);
-    		  pathmap.centerAndZoom(pathpoints[pathpoints.length-1],15); 
-    		  pathmap.panTo(pathpoints[pathpoints.length-1]);      
+	        MapForShow.clearOverlays();
+	        MapForShow.addOverlay(Startmarker);
+	        MapForShow.addOverlay(Endmarker);
+	        MapForShow.addOverlay(line);
+	        MapForShow.centerAndZoom(pathpoints[pathpoints.length-1],15); 
+	        MapForShow.panTo(pathpoints[pathpoints.length-1]);      
 	  }
 	 
 });
@@ -673,7 +757,7 @@ function ShowInfo()
      document.getElementById("Info_speed_avg").innerHTML="平均速度："+avgspeed.toFixed(2)+"km/h";
      maxspeed=Math.max.apply(null, sppedArray);
      document.getElementById("Info_speed_max").innerHTML="最高速度："+maxspeed.toFixed(2)+"km/h";
-     
+     getPath(section[index][0].time,section[index][len].time,informationmap);
      $.ajax
 	    ({
  	  //type:"POST",
@@ -758,13 +842,13 @@ function AddMarkerOnMap(res)
 {
 	
 	var data_info=new Array();
-	informationmap.clearOverlays();
+	//informationmap.clearOverlays();
 	for(var i=0;i<res.length;i++)
 		{
 		    var s= new Date();
 	 		s.setTime(res[i].time);
 	 		var ctime=s.getHours()+":"+s.getMinutes()+":"+s.getSeconds();
-			data_info[i]=[res[i].longitude,res[i].latitude,ctime+"<br/>"+res[i].reason+"<br/>"+"速度："+res[i].velocity+"km/h"];
+			data_info[i]=[res[i].longitude,res[i].latitude,ctime+"<br/>"+res[i].reason+"<br/>"+"速度："+res[i].velocity+"km/h"+"<br/>"+"加速度："+res[i].acceleration+"m/s^2"];
 		}
 	
    for(var i=0;i<data_info.length;i++){
@@ -787,7 +871,7 @@ function addClickHandler(content,marker){
 function openInfo(content,e){
 	var opts = {
 			width : 250,     // 信息窗口宽度
-			height: 80,     // 信息窗口高度
+			height: 90,     // 信息窗口高度
 			title : "不良驾驶信息" , // 信息窗口标题
 			enableMessage:true//设置允许信息窗发送短息
 		   };
@@ -798,6 +882,7 @@ function openInfo(content,e){
 }
 function Add_bad_driving(reason)
 {
+	bad_driving_time++;
 	document.getElementById("realtime_illegal").innerHTML=bad_driving_time+"次";
 	$.ajax
     ({
@@ -805,7 +890,7 @@ function Add_bad_driving(reason)
 	  //dataType:"json",
 	  cache:false,
 	  url:"savebadbehaviorinfo.json",
-	  data:{longitude:point.lng,latitude:point.lat,velocity: speed,reason:reason,username:username},
+	  data:{longitude:point.lng,latitude:point.lat,velocity: speed,acceleration:acceleration,reason:reason,username:username},
 	  //contentType:"application/json",
 	  error: function(XMLHttpRequest, textStatus, errorThrown) {
             //alert(XMLHttpRequest.status);
@@ -870,6 +955,7 @@ function Show_BadBehaviorMap()
 		if(BadBehaviorInfo.length>0)
 		{
 		AddMarkerOnMap(BadBehaviorInfo);
+		//ShowBadBehaviorPath();
 		}
 		
 	   // });  
@@ -911,9 +997,9 @@ function my_ChangePassWord()
 		  data:{oldcode:oldcode,newcode:newcode,name:username},
 		  //contentType:"application/json",
 		  error: function(XMLHttpRequest, textStatus, errorThrown) {
-	            alert(XMLHttpRequest.status);
-	            alert(XMLHttpRequest.readyState);
-	            alert(textStatus);
+	            //alert(XMLHttpRequest.status);
+	            //alert(XMLHttpRequest.readyState);
+	            //alert(textStatus);
 		  },
 		  success:function(res){
 		      //alert(res)
@@ -930,9 +1016,70 @@ function my_ChangePassWord()
 }
 function my_exit()
 {
-	window.location.href="http://115.28.243.122:20306/DrivingBehavior/";
+	window.location.href="/DrivingBehavior/";
+}
+function AddBusRouteOnMap()
+{
+	getCriticalSectionInfo();
+}
+function getCriticalSectionInfo()
+{
+	var obj = document.getElementById("bus_route"); //定位id
+	var index = obj.selectedIndex; // 选中索引
+	Bus_Route = obj.options[index].text; // 选中文本
+	$.ajax
+    ({
+	 //type:"POST",
+	  //dataType:"json",
+	  cache:false,
+	  url:"getcriticalsectionInfoByNo.json",
+	  data:{no:Bus_Route},
+	  //contentType:"application/json",
+	  error: function(XMLHttpRequest, textStatus, errorThrown) {
+           // alert(XMLHttpRequest.status);
+            //alert(XMLHttpRequest.readyState);
+            //alert(textStatus);
+	  },
+	  success:function(res){
+	      for(var i=0;i<res.length;i++)
+	    	  {
+	    	  CriticalSectionInfo[i]=res[i];
+	    	  }
+	      var busline = new BMap.BusLineSearch("重庆",{
+	  		renderOptions:{map:map},
+	  			onGetBusListComplete: function(result){
+	  			   if(result) {
+	  				 var fstLine = result.getBusListItem(0);//获取第一个公交列表显示到map上
+	  				 busline.getBusLine(fstLine);
+	  			   }
+	  			}
+	  	});
+	        var busName = Bus_Route;
+			busline.getBusList(busName);
+			//map.clearOverlays();
+	  		
+	  }
+    });
 }
 
+//计算两点间距离
+var EARTH_RADIUS = 6378137;
+function rad( d)
+{
+   return d * Math.PI / 180.0;
+}
+function GetDistance( lng1,  lat1,  lng2,  lat2)
+ {
+        var radLat1 = rad(lat1);
+        var radLat2 = rad(lat2);
+        var a = radLat1 - radLat2;
+        var b = rad(lng1) - rad(lng2);
+        var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) + 
+         Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
+        s = s * EARTH_RADIUS;
+        s = Math.round(s * 10000) / 10000;
+        return s;
+}
 	$(function ($) {
 		//弹出登录
 		$("#example").hover(function () {
