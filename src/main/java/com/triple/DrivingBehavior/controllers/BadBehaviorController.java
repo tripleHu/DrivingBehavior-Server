@@ -20,12 +20,13 @@ public class BadBehaviorController {
 private BadBehaviorCRUD badbehaviorCRUD;
 @RequestMapping(value="/demo/savebadbehaviorinfo.json",method={RequestMethod.POST})
 @ResponseBody 
-public String SaveBadBehaviorInfo(double longitude,double latitude,float velocity,String reason,String username)
+public String SaveBadBehaviorInfo(double longitude,double latitude,float velocity,float acceleration,String reason,String username)
 {
 	BadBehavior info=new BadBehavior();
 	info.setLatitude(latitude);
 	info.setLongitude(longitude);
 	info.setVelocity(velocity);
+	info.setAcceleration(acceleration);
 	info.setReason(reason);
 	info.setTime(new Date());
 	info.setUser(badbehaviorCRUD.getUser(username));

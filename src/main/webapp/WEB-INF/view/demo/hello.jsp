@@ -165,7 +165,7 @@ $(function() {
 						var temper2=date+" "+endtime;
 						var dt2 = new Date(temper2.replace(/-/,"/"));
 						//alert(dt1+"--"+dt2);
-						getPath(dt1.getTime(),dt2.getTime());
+						getPath(dt1.getTime(),dt2.getTime(),pathmap);
 					}
 		</script>
      	</div>
@@ -316,7 +316,7 @@ function counting_time()
 	if(driving_time==3600*4)
 		{
 		alert("您已经连续驾驶超过4小时，请停车休息！");
-		bad_driving_time++;
+		
 		Add_bad_driving("连续驾驶超过4小时");
 		}
 	}
@@ -484,13 +484,15 @@ function HideDiv4()
 	//document.getElementById("path_panels").style.display ="none";
 	getMyInfo();
 }
+
 function getUrlParam(name)
 {
 var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
 var r = window.location.search.substr(1).match(reg);  //匹配目标参数
 if (r!=null) return unescape(r[2]); return null; //返回参数值
 } 
-function getPath(start,end)
+
+function getPath(start,end,MapForShow)
 {
 	//starttime=Date.UTC(2015,11-1,6,20,0,0)-8*3600*1000; 
 	//endtime=Date.UTC(2015,11-1,6,20,30,0)-8*3600*1000; 
@@ -526,18 +528,18 @@ function getPath(start,end)
 	        var path_distance=0;
 	        for(var b=0;b<pathpoints.length-1;b++)
 	    	{
-	        	path_distance+=pathmap.getDistance(pathpoints[b],pathpoints[b+1]);
+	        	path_distance+=MapForShow.getDistance(pathpoints[b],pathpoints[b+1]);
 	    	}
-	        alert("查询成功,距离为："+path_distance.toFixed(2)+"米");
+	        //alert("查询成功,距离为："+path_distance.toFixed(2)+"米");
 	        var line=new BMap.Polyline(pathpoints, {strokeColor:"blue", strokeWeight:3, strokeOpacity:0.5}); 
 	        var Startmarker = new BMap.Marker(pathpoints[0],{icon:myIconStart}); //创建标注
 	        var Endmarker = new BMap.Marker(pathpoints[pathpoints.length-1],{icon:myIconEnd});
-	          pathmap.clearOverlays();
-	          pathmap.addOverlay(Startmarker);
-	          pathmap.addOverlay(Endmarker);
-    		  pathmap.addOverlay(line);
-    		  pathmap.centerAndZoom(pathpoints[pathpoints.length-1],15); 
-    		  pathmap.panTo(pathpoints[pathpoints.length-1]);      
+	        MapForShow.clearOverlays();
+	        MapForShow.addOverlay(Startmarker);
+	        MapForShow.addOverlay(Endmarker);
+	        MapForShow.addOverlay(line);
+	        MapForShow.centerAndZoom(pathpoints[pathpoints.length-1],15); 
+	        MapForShow.panTo(pathpoints[pathpoints.length-1]);      
 	  }
 	 
 });
@@ -674,6 +676,8 @@ function ShowInfo()
      maxspeed=Math.max.apply(null, sppedArray);
      document.getElementById("Info_speed_max").innerHTML="最高速度："+maxspeed.toFixed(2)+"km/h";
      
+     getPath(section[index][0].time,section[index][len].time,informationmap);
+     
      $.ajax
 	    ({
  	  //type:"POST",
@@ -758,13 +762,13 @@ function AddMarkerOnMap(res)
 {
 	
 	var data_info=new Array();
-	informationmap.clearOverlays();
+	//informationmap.clearOverlays();
 	for(var i=0;i<res.length;i++)
 		{
 		    var s= new Date();
 	 		s.setTime(res[i].time);
 	 		var ctime=s.getHours()+":"+s.getMinutes()+":"+s.getSeconds();
-			data_info[i]=[res[i].longitude,res[i].latitude,ctime+"<br/>"+res[i].reason+"<br/>"+"速度："+res[i].velocity+"km/h"];
+	 		data_info[i]=[res[i].longitude,res[i].latitude,ctime+"<br/>"+res[i].reason+"<br/>"+"速度："+res[i].velocity+"km/h"+"<br/>"+"加速度："+res[i].acceleration+"m/s^2"];
 		}
 	
    for(var i=0;i<data_info.length;i++){
@@ -787,7 +791,7 @@ function addClickHandler(content,marker){
 function openInfo(content,e){
 	var opts = {
 			width : 250,     // 信息窗口宽度
-			height: 80,     // 信息窗口高度
+			height: 90,     // 信息窗口高度
 			title : "不良驾驶信息" , // 信息窗口标题
 			enableMessage:true//设置允许信息窗发送短息
 		   };
@@ -798,6 +802,7 @@ function openInfo(content,e){
 }
 function Add_bad_driving(reason)
 {
+	bad_driving_time++;
 	document.getElementById("realtime_illegal").innerHTML=bad_driving_time+"次";
 	$.ajax
     ({
@@ -805,7 +810,7 @@ function Add_bad_driving(reason)
 	  //dataType:"json",
 	  cache:false,
 	  url:"savebadbehaviorinfo.json",
-	  data:{longitude:point.lng,latitude:point.lat,velocity: speed,reason:reason,username:username},
+	  data:{longitude:point.lng,latitude:point.lat,velocity: speed,acceleration:acceleration,reason:reason,username:username},
 	  //contentType:"application/json",
 	  error: function(XMLHttpRequest, textStatus, errorThrown) {
             //alert(XMLHttpRequest.status);
