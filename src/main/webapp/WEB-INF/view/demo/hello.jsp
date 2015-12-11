@@ -190,7 +190,8 @@ $(function() {
  <div style="position:absolute; top:23%;width:100%;height:5%;">
  <select name="No"  style="width:100%; font-size:18px" id="bus_route" onchange="AddBusRouteOnMap()">
 	<option>805路</option>	
-    <option>806路</option>			
+    <option>806路</option>		
+    <option>249路</option>			
  </select>
  </div>
  <div class="toogle_wrap">
