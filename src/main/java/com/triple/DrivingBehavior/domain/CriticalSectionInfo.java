@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="criticalsectionInfo")
+@Table(name="CriticalSectionInfo")
 public class CriticalSectionInfo {
 	//自动增长的逻辑主键
 			@Id

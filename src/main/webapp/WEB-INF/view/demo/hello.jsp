@@ -411,7 +411,7 @@ function whether_in_CriticalSection()
 		if(GetDistance( point.lng,  point.lat,  CriticalSectionInfo[i].longitude,  CriticalSectionInfo[i].latitude)<50)//进入关键区域半径50米内
 			{
 			var now = new Date();
-			now.setHours(18, 0, 0, 0);
+			
 			var rushhour_morning_start=new Date();
 			rushhour_morning_start.setHours(7, 30, 0, 0);
 			var rushhour_morning_end=new Date();
@@ -455,7 +455,7 @@ function theLocation(longitude,latitude,orienta)
 						//BMap.getDistance
 						//map.removeOverlay(vectorFCArrowGPS); 
 						//map.removeOverlay(vectorFCArrow); 
-						map.clearOverlays();
+						map.removeOverlay(vectorFCArrow);
 						//alert("asdas");
 						point = new BMap.Point(longitude,latitude);
 						vectorFCArrow = new BMap.Marker(point, {
