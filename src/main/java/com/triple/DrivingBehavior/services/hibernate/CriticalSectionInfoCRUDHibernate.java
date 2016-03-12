@@ -34,6 +34,7 @@ public class CriticalSectionInfoCRUDHibernate implements CriticalSectionInfoCRUD
 	}
 
 	@Override
+	@Transactional
 	public void editById(Long id, CriticalSectionInfo newinfo) {
 		CriticalSectionInfo info=this.getbyId(id);
 		info.setBusstation(newinfo.getBusstation());
@@ -51,12 +52,14 @@ public class CriticalSectionInfoCRUDHibernate implements CriticalSectionInfoCRUD
 	}
 
 	@Override
+	@Transactional
 	public void deleteById(Long id) {
 		CriticalSectionInfo info=this.getbyId(id);
 		ht.delete(info);
 		
 	}
 	@Override
+	@Transactional
 	public CriticalSectionInfo getbyId(Long id) {
 		return ht.get(CriticalSectionInfo.class,id);
 	}
