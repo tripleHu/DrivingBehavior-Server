@@ -251,6 +251,12 @@ $(function() {
 		        var CriticalSectionInfo=new Array();//关键区域信息
 		        var Bus_Route;
 		        var BMobile;//判断是否是移动端访问
+		        var BCriticalSectionInLastSec=false;
+		        var BInCriticalSection=false;
+		        var CriticalSectionAvgSpeed=0;
+		        var CriticalSectionAvgAcceleration=0;
+		        var InCriticalSectionCount=0; //进入关键区域累计记录的速度次数
+		        var CriticalSectionNum=-1;
 				map.centerAndZoom(point, 15);                 //初始化地图，设置中心点坐标和地图级别
 				pathmap.centerAndZoom(point, 18);
 				informationmap.centerAndZoom(point, 18);
@@ -286,9 +292,9 @@ $(function() {
 				setInterval("counting_time()",1000);//1000为1秒钟  
 				if(BMobile)
 				{
-				setInterval("whether_in_CriticalSection()",1000);//1000为1秒钟  
+					setInterval("whether_in_CriticalSection()",1000);//1000为1秒钟  
 				}
-				setInterval("myInterval()",5000);//1000为1秒钟  
+					setInterval("myInterval()",5000);//1000为1秒钟  
 	});
 function BMobileVisit()
 	{
@@ -406,45 +412,95 @@ function myInterval()
 function whether_in_CriticalSection()
 {
 	if(speed>0)
-		{
+	{
 		for(var i=0;i<CriticalSectionInfo.length;i++)
 		{
-		if(GetDistance( point.lng,  point.lat,  CriticalSectionInfo[i].longitude,  CriticalSectionInfo[i].latitude)<50)//进入关键区域半径50米内
+		 if(GetDistance( point.lng,  point.lat,  CriticalSectionInfo[i].longitude,  CriticalSectionInfo[i].latitude)<50
+				 &&(GetRushHourState()==CriticalSectionInfo[i].rushhour))//进入关键区域半径50米内
 			{
-			var now = new Date();
-			
-			var rushhour_morning_start=new Date();
-			rushhour_morning_start.setHours(7, 30, 0, 0);
-			var rushhour_morning_end=new Date();
-			rushhour_morning_end.setHours(8, 30, 0, 0);
-			var rushhour_evening_start=new Date();
-			rushhour_evening_start.setHours(17, 00, 0, 0);
-			var rushhour_evening_end=new Date();
-			rushhour_evening_end.setHours(19, 0, 0, 0);
-			if((rushhour_morning_start<now&&now<rushhour_morning_end)||(rushhour_evening_start<now&&now<rushhour_evening_end)&&CriticalSectionInfo[i].rushhour==true)
-			{
-				
-				CheckSpeedAndAcceleration(CriticalSectionInfo[i]);
+			 	if(i!=CriticalSectionNum)
+			 	{
+			 		CriticalSectionNum=i;
+			 		BInCriticalSection==false;
+			 		BCriticalSectionInLastSec==false;
+			 	}
+			 	if(BInCriticalSection==false&&BCriticalSectionInLastSec==false)
+			 	{
+			 		State_Entering();
+			 	}
+			 	if(BInCriticalSection==true&&BCriticalSectionInLastSec==true)
+			 	{
+			 		State_In();
+			 	}
 			}
-			if((rushhour_morning_start>now||now>rushhour_morning_end)&&(rushhour_evening_start>now||now>rushhour_evening_end)&&CriticalSectionInfo[i].rushhour==false)
-			{
-				
-				CheckSpeedAndAcceleration(CriticalSectionInfo[i]);
-			}
-			}
+		 else
+			 {
+				 if(BInCriticalSection==true&&BCriticalSectionInLastSec==true
+						 &&GetDistance( point.lng,  point.lat,  CriticalSectionInfo[CriticalSectionNum].longitude,  CriticalSectionInfo[CriticalSectionNum].latitude)>50)
+			 	 {
+			 		State_Outing();
+			 	 }
+			 }
 		}
-		}
+	}
+}
+function GetRushHourState()
+{
+	var now = new Date();
+	var rushhour_morning_start=new Date();
+	rushhour_morning_start.setHours(7, 00, 0, 0);
+	var rushhour_morning_end=new Date();
+	rushhour_morning_end.setHours(9, 00, 0, 0);
+	var rushhour_evening_start=new Date();
+	rushhour_evening_start.setHours(17, 00, 0, 0);
+	var rushhour_evening_end=new Date();
+	rushhour_evening_end.setHours(19, 0, 0, 0);
+	if((rushhour_morning_start<now&&now<rushhour_morning_end)||(rushhour_evening_start<now&&now<rushhour_evening_end))
+	{
+		return true;
+	}
+	if((rushhour_morning_start>now||now>rushhour_morning_end)&&(rushhour_evening_start>now||now>rushhour_evening_end)&&CriticalSectionInfo[i].rushhour==false)
+	{
+		return false;
+	}
+}
+function State_Entering()
+{
+	BInCriticalSection==true;
+	BCriticalSectionInLastSec==true;
+	
+}
+function State_In()
+{
+	CriticalSectionAvgSpeed=CriticalSectionAvgSpeed+speed;
+	CriticalSectionAvgAcceleration=CriticalSectionAvgAcceleration+acceleration;
+	InCriticalSectionCount++;
+}
+function State_Outing()
+{
+	CriticalSectionAvgSpeed=CriticalSectionAvgSpeed/InCriticalSectionCount;
+	CriticalSectionAvgAcceleration=CriticalSectionAvgAcceleration/InCriticalSectionCount;
+	CheckSpeedAndAcceleration(CriticalSectionInfo[CriticalSectionNum]);
+	BInCriticalSection==false;
+	BCriticalSectionInLastSec==false;
+	CriticalSectionAvgSpeed=0;
+	CriticalSectionAvgAcceleration=0;
+	InCriticalSectionCount=0;
 }
 function CheckSpeedAndAcceleration(Info)
 {
+	var str="";
 	if(speed>Info.maxspeed)
-		Add_bad_driving("大于良好驾驶最大速度");
+		str+="大于良好驾驶最大速度；";
 	if(speed<Info.minspeed)
-		Add_bad_driving("小于良好驾驶最小速度");
+		str+="小于良好驾驶最小速度；";
 	if(acceleration>Info.max_acceleration)
-		Add_bad_driving("大于良好驾驶最大加速度");
+		str+="大于良好驾驶最大加速度";
 	if(acceleration<Info.min_acceleration)
-		Add_bad_driving("小于良好驾驶最小加速度");
+		str+="小于良好驾驶最小加速度";
+	if(str=="")
+		return;
+	Add_bad_driving(str);
 }
 function theLocation(longitude,latitude,orienta)
 {
