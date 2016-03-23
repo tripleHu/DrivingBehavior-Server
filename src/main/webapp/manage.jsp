@@ -12,5 +12,8 @@
 <a href="/DrivingBehavior/manage/addCriticalSectionInfo">addCriticalSectioninfo</a><br/>
 
 <a href="/DrivingBehavior/manage/UpdateCriticalSectionInfo">UpdateCriticalSectioninfo</a><br/>
+
+<a href="/DrivingBehavior/manage/AddDrivingInfo">AddDrivingInfo</a><br/>
+
 </body>
 </html>

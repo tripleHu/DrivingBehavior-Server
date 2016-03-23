@@ -33,7 +33,7 @@ public class CriticalSectionInfoController {
 		mv.setViewName("/manage/addCriticalSectionInfo");
 		return mv;
 	}
-	@RequestMapping(value="/manage/UpdateCriticalSectionInfo")
+	@RequestMapping(value={"/manage/UpdateCriticalSectionInfo","manage/AddDrivingInfo"})
 	public ModelAndView show()
 	{
 		ModelAndView mv=new ModelAndView();

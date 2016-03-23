@@ -40,18 +40,18 @@ public String recordLocation( double longitude,double latitude,float velocity,fl
 	drivingInfoCRUD.add(info);
 	return "1";
 }
-@RequestMapping(value="/demo/getDrivingInfoByTime.json")
+@RequestMapping(value={"/demo/getDrivingInfoByTime.json","manage/getDrivingInfoByTime.json"})
 @ResponseBody 
 public List<DrivingInfo> getDrivingInfoByTime(long starttime,long endtime,String username)
 {
 	Date ST=new Date(starttime);
 	Date ET=new Date(endtime);
 	Date nowDate=new Date();
-	System.out.println(ST);
-	System.out.println(ET);
-	System.out.println(nowDate);
+	//System.out.println(ST);
+	//System.out.println(ET);
+	//System.out.println(nowDate);
 	List<DrivingInfo>infos=drivingInfoCRUD.getInfobyTime(ST, ET, username);
-	System.out.println(infos.size());
+	//System.out.println(infos.size());
 	return infos;
 }
 @RequestMapping(value="/demo/getMyInfo.json")
@@ -84,6 +84,45 @@ public Map<String,Double> getDistanceAndAvgSpeed(String name)
 	else {
 		return null;
 	}
+}
+@RequestMapping(value="/manage/UpdateDrivingInfo.json",method={RequestMethod.POST})
+@ResponseBody 
+public String UpdateDrivingInfo(long time, double longitude,double latitude,float velocity,float orientation,float acceleration,long id)
+{
+	Date T=new Date(time);
+	System.out.println(T);
+	DrivingInfo info=drivingInfoCRUD.getById(id);
+	info.setLatitude(latitude);
+	info.setLongitude(longitude);
+	info.setVelocity(velocity);
+	info.setOrientation(orientation);
+	info.setAcceleration(acceleration);
+	info.setTime(T);
+	drivingInfoCRUD.editById(id, info);
+	return "1";
+}
+@RequestMapping(value="/manage/DeleteSelectedDrivingInfo.json",method={RequestMethod.POST})
+@ResponseBody 
+public String DeleteSelectedDrivingInfo(long id)
+{
+	drivingInfoCRUD.deleteById(id);
+	return "1";
+}
+@RequestMapping(value="/manage/AddDrivingInfo.json",method={RequestMethod.POST})
+@ResponseBody 
+public String AddDrivingInfo(long time,double longitude,double latitude,float velocity,float orientation,float acceleration,String username)
+{
+	Date T=new Date(time);
+	DrivingInfo info=new DrivingInfo();
+	info.setLatitude(latitude);
+	info.setLongitude(longitude);
+	info.setVelocity(velocity);
+	info.setOrientation(orientation);
+	info.setAcceleration(acceleration);
+	info.setTime(T);
+	info.setUser(drivingInfoCRUD.getUser(username));
+	drivingInfoCRUD.add(info);
+	return "1";
 }
 private static double EARTH_RADIUS = 6378137;
 private static double rad(double d)

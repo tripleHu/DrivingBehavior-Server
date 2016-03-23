@@ -39,6 +39,7 @@ public class DrivingInfoCRUDHibernate implements DrivingInfoCRUD{
 		info.setTime(newDrivingInfo.getTime());
 		info.setUser(newDrivingInfo.getUser());
 		info.setVelocity(newDrivingInfo.getVelocity());
+		System.out.println("update DrivingInfo id:"+info.getId());
 		ht.update(info);
 	}
 

@@ -22,6 +22,7 @@ public class TestController
 		mv.setViewName("/demo/hello");
 		return mv;
 	}
+	
 	@RequestMapping(value="/demo/addUser.json")
 	@ResponseBody
 	public User addUser()
