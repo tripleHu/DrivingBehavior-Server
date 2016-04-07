@@ -83,7 +83,7 @@ $(function() {
         </div>
         <div class="row">
            日期: <span class="inputBox">
-                <input type="date" id="InfoChooseDate" placeholder="" onchange="AddDrivingTime()"/>
+                <input type="date" id="InfoChooseDate"  oninput="AddDrivingTime()"/>
             </span>
         </div>
         <div class="row">
@@ -161,9 +161,9 @@ $(function() {
 							}
 						//alert(date+","+starttime+","+endtime);
 						var temper1=date+" "+starttime;
-						var dt1 = new Date(temper1.replace(/-/,"/"));
+						var dt1 = new Date(temper1.replace(/-/g,"/"));
 						var temper2=date+" "+endtime;
-						var dt2 = new Date(temper2.replace(/-/,"/"));
+						var dt2 = new Date(temper2.replace(/-/g,"/"));
 						//alert(dt1+"--"+dt2);
 						getPath(dt1.getTime(),dt2.getTime(),pathmap);
 					}
@@ -421,8 +421,8 @@ function whether_in_CriticalSection()
 			 	if(i!=CriticalSectionNum)
 			 	{
 			 		CriticalSectionNum=i;
-			 		BInCriticalSection==false;
-			 		BCriticalSectionInLastSec==false;
+			 		BInCriticalSection=false;
+			 		BCriticalSectionInLastSec=false;
 			 	}
 			 	if(BInCriticalSection==false&&BCriticalSectionInLastSec==false)
 			 	{
@@ -459,15 +459,15 @@ function GetRushHourState()
 	{
 		return true;
 	}
-	if((rushhour_morning_start>now||now>rushhour_morning_end)&&(rushhour_evening_start>now||now>rushhour_evening_end)&&CriticalSectionInfo[i].rushhour==false)
+	if((rushhour_morning_start>now||now>rushhour_morning_end)&&(rushhour_evening_start>now||now>rushhour_evening_end))
 	{
 		return false;
 	}
 }
 function State_Entering()
 {
-	BInCriticalSection==true;
-	BCriticalSectionInLastSec==true;
+	BInCriticalSection=true;
+	BCriticalSectionInLastSec=true;
 	
 }
 function State_In()
@@ -481,8 +481,8 @@ function State_Outing()
 	CriticalSectionAvgSpeed=CriticalSectionAvgSpeed/InCriticalSectionCount;
 	CriticalSectionAvgAcceleration=CriticalSectionAvgAcceleration/InCriticalSectionCount;
 	CheckSpeedAndAcceleration(CriticalSectionInfo[CriticalSectionNum]);
-	BInCriticalSection==false;
-	BCriticalSectionInLastSec==false;
+	BInCriticalSection=false;
+	BCriticalSectionInLastSec=false;
 	CriticalSectionAvgSpeed=0;
 	CriticalSectionAvgAcceleration=0;
 	InCriticalSectionCount=0;
@@ -491,16 +491,33 @@ function CheckSpeedAndAcceleration(Info)
 {
 	var str="";
 	if(speed>Info.maxspeed)
-		str+="大于良好驾驶最大速度；";
+	{
+		if(abs(acceleration)>Info.max_acceleration)
+			str+="速度大于良好驾驶最大速度；加速度大于良好驾驶最大加速度";
+		if(abs(acceleration)<Info.min_acceleration)
+			str+="速度大于良好驾驶最大速度；加速度小于良好驾驶最小加速度";
+		if(Info.min_acceleration<=abs(acceleration)&&abs(acceleration)<=Info.max_acceleration)
+			str+="速度大于良好驾驶最大速度";
+	}
 	if(speed<Info.minspeed)
-		str+="小于良好驾驶最小速度；";
-	if(acceleration>Info.max_acceleration)
-		str+="大于良好驾驶最大加速度";
-	if(acceleration<Info.min_acceleration)
-		str+="小于良好驾驶最小加速度";
+	{
+		if(abs(acceleration)>Info.max_acceleration)
+			str+="速度小于良好驾驶最小速度；加速度大于良好驾驶最大加速度";
+		if(abs(acceleration)<Info.min_acceleration)
+			str+="速度小于良好驾驶最小速度；加速度小于良好驾驶最小加速度";
+		if(Info.min_acceleration<=abs(acceleration)&&abs(acceleration)<=Info.max_acceleration)
+			str+="速度小于良好驾驶最小速度";
+	}
+	if(Info.minspeed<speed&&Info.maxspeed<speed)
+	{
+		if(abs(acceleration)>Info.max_acceleration)
+			str+="加速度大于良好驾驶最大加速度";
+		if(abs(acceleration)<Info.min_acceleration)
+			str+="加速度小于良好驾驶最小加速度";
+	}
 	if(str=="")
 		return;
-	Add_bad_driving(str);
+	//Add_bad_driving(str);
 }
 function theLocation(longitude,latitude,orienta)
 {
@@ -697,8 +714,8 @@ function AddDrivingTime()
 	var endtime="23:59:59";
 	var temper1=date+" "+starttime;
 	var temper2=date+" "+endtime;
-	var dt1 = new Date(temper1.replace(/-/,"/"));
-	var dt2= new Date(temper2.replace(/-/,"/"));
+	var dt1 = new Date(temper1.replace(/-/g,"/"));
+	var dt2= new Date(temper2.replace(/-/g,"/"));
 	$.ajax
     ({
 	//type:"POST",
@@ -810,7 +827,7 @@ function ShowInfo()
     	 avgspeed+=section[index][i].velocity;
     	 sppedArray[i]=section[index][i].velocity;
     }
-     avgspeed=avgspeed/len+1;
+     avgspeed=avgspeed/(len+1);
      document.getElementById("Info_speed_avg").innerHTML="平均速度："+avgspeed.toFixed(2)+"km/h";
      maxspeed=Math.max.apply(null, sppedArray);
      document.getElementById("Info_speed_max").innerHTML="最高速度："+maxspeed.toFixed(2)+"km/h";
@@ -831,6 +848,10 @@ function ShowInfo()
  	  },
  	  success:function(res){
  		  BadBehaviorInfo=res;
+ 		  document.getElementById("IllegalInfo_1").innerHTML ="";
+ 		  document.getElementById("IllegalInfo_2").innerHTML ="";
+ 		  document.getElementById("IllegalInfo_3").innerHTML ="";
+ 		 
  		  if(res.length==0)
  		 {
  		 document.getElementById("driving_star").className="rating rating-5";
@@ -840,53 +861,60 @@ function ShowInfo()
  		 if(res.length==1)
  		 {
  		 document.getElementById("driving_star").className="rating rating-4";
- 		 document.getElementById("info_score").innerHTML="85";
+ 		 document.getElementById("info_score").innerHTML="95";
  		 }
  		if(res.length==2)
 		 {
 		 document.getElementById("driving_star").className="rating rating-3";
-		 document.getElementById("info_score").innerHTML="60";
+		 document.getElementById("info_score").innerHTML="85";
 		 }
  		if(res.length==3)
 		 {
 		 document.getElementById("driving_star").className="rating rating-2";
-		 document.getElementById("info_score").innerHTML="60";
+		 document.getElementById("info_score").innerHTML="70";
 		 }
  		if(res.length>3)
 		 {
 		 document.getElementById("driving_star").className="rating rating-1";
-		 document.getElementById("info_score").innerHTML="40";
+		 document.getElementById("info_score").innerHTML="50";
 		 }
- 		if(res.length<=4)
+ 		if(res.length<=1)
  		{
- 			for(var i=0;i<res.length;i++)
- 			{
- 			var reason=res[i].reason;
- 			var j=i+1;
- 			temp_point=new BMap.Point(res[i].longitude, res[i].latitude);
+ 			
+ 			var reason=res[0].reason;
+ 			temp_point=new BMap.Point(res[0].longitude, res[0].latitude);
  			geoc.getLocation(temp_point, function(rs){
  			var addComp = rs.addressComponents;
  			var address=addComp.street+" "+addComp.streetNumber;
  			//alert(address);
- 			document.getElementById("IllegalInfo_"+j).innerHTML =address+"——"+reason;
- 		}); 
- 			}
+ 			document.getElementById("IllegalInfo_1").innerHTML =address+"——"+reason;
+ 			}); 
+ 			
  		}
- 		if(res.length>4)
+ 		
+ 		if(res.length>=2)
  		{
- 			for(var i=0;i<3;i++)
- 			{
- 				var reason=res[i].reason;
- 	 			var j=i+1;
- 			temp_point=new BMap.Point(res[i].longitude, res[i].latitude);
+ 			var reason1=res[0].reason;
+ 			temp_point=new BMap.Point(res[0].longitude, res[0].latitude);
  			geoc.getLocation(temp_point, function(rs){
  			var addComp = rs.addressComponents;
  			var address=addComp.street+" "+addComp.streetNumber;
  			//alert(EndPoint);
- 			document.getElementById("IllegalInfo_"+j).innerHTML =address+"——"+reason;
+ 			document.getElementById("IllegalInfo_1").innerHTML =address+"——"+reason1;
  		}); 
+ 			var reason2=res[1].reason;
+ 			temp_point=new BMap.Point(res[1].longitude, res[1].latitude);
+ 			geoc.getLocation(temp_point, function(rs){
+ 			var addComp = rs.addressComponents;
+ 			var address=addComp.street+" "+addComp.streetNumber;
+ 			//alert(EndPoint);
+ 			document.getElementById("IllegalInfo_2").innerHTML =address+"——"+reason2;
+ 		}); 
+ 			if(res.length>2)
+ 			{
+ 				document.getElementById("IllegalInfo_3").innerHTML ="... ...";
  			}
- 			document.getElementById("IllegalInfo_4").innerHTML ="... ...";
+ 			
  		}
  		
  	  }
@@ -1106,7 +1134,7 @@ function getCriticalSectionInfo()
 	  		renderOptions:{map:map},
 	  			onGetBusListComplete: function(result){
 	  			   if(result) {
-	  				 var fstLine = result.getBusListItem(0);//获取第一个公交列表显示到map上
+	  				 var fstLine = result.getBusListItem(1);//获取第2个公交列表显示到map上
 	  				 busline.getBusLine(fstLine);
 	  			   }
 	  			}
