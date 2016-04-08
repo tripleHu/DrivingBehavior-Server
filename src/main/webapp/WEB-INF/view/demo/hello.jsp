@@ -83,7 +83,7 @@ $(function() {
         </div>
         <div class="row">
            日期: <span class="inputBox">
-                <input type="date" id="InfoChooseDate"  oninput="AddDrivingTime()"/>
+                <input type="date" id="InfoChooseDate"  onchange="AddDrivingTime()"/>
             </span>
         </div>
         <div class="row">
